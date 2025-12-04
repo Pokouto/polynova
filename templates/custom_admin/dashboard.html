@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administration - PolyNova</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50; --secondary: #3498db; --success: #2ecc71;
+            --danger: #e74c3c; --warning: #f1c40f; --light: #ecf0f1;
+            --dark-bg: #1a252f;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f6f9; display: flex; height: 100vh; overflow: hidden; }
+        
+        /* SIDEBAR */
+        .sidebar { width: 260px; background: var(--primary); color: white; display: flex; flex-direction: column; flex-shrink: 0; transition: 0.3s; }
+        .logo { padding: 20px; font-size: 1.4rem; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 10px; }
+        .logo span { color: var(--secondary); }
+        .admin-info { padding: 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.1); }
+        .admin-avatar { width: 50px; height: 50px; background: var(--secondary); border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: white; }
+        
+        .menu { flex: 1; overflow-y: auto; padding: 10px 0; }
+        .menu-label { padding: 10px 20px; font-size: 0.7rem; text-transform: uppercase; color: #95a5a6; font-weight: bold; margin-top: 15px; letter-spacing: 1px; }
+        .menu a { padding: 12px 20px; color: #bdc3c7; text-decoration: none; display: flex; align-items: center; gap: 12px; border-left: 3px solid transparent; transition: 0.2s; cursor: pointer; font-size: 0.9rem; }
+        .menu a:hover, .menu a.active { background: rgba(0,0,0,0.2); color: white; border-left-color: var(--secondary); }
+        .menu a i { width: 20px; text-align: center; }
+        
+        /* MAIN CONTENT */
+        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .top-header { background: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e0e0e0; height: 70px; }
+        .page-title { font-size: 1.2rem; font-weight: 600; color: var(--primary); }
+        .content { flex: 1; overflow-y: auto; padding: 30px; }
+        
+        /* CARDS */
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .card { background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 20px; border-left: 4px solid var(--primary); display: flex; justify-content: space-between; align-items: center; }
+        .card.success { border-left-color: var(--success); } .card.warning { border-left-color: var(--warning); } .card.info { border-left-color: var(--secondary); }
+        .stat-info h3 { font-size: 2rem; font-weight: bold; margin: 0; color: var(--primary); }
+        .stat-info p { margin: 0; color: #7f8c8d; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; }
+        .stat-icon { font-size: 2rem; opacity: 0.2; }
+        
+        /* SECTIONS & PANELS */
+        .section { display: none; animation: fadeIn 0.3s; } .section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .panel { background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 30px; overflow: hidden; }
+        .panel-head { padding: 15px 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; background: #fafafa; }
+        .panel-head h3 { font-size: 1rem; margin: 0; color: var(--primary); font-weight: 700; }
+        
+        /* TABLES */
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th { text-align: left; padding: 15px 20px; background: #f8f9fa; color: #7f8c8d; text-transform: uppercase; font-size: 0.75rem; font-weight: 700; }
+        td { padding: 15px 20px; border-bottom: 1px solid #eee; color: #2c3e50; vertical-align: middle; }
+        tr:hover { background-color: #f9f9f9; }
+        
+        /* CLICKABLE ROWS */
+        .clickable-name { color: var(--secondary); font-weight: 600; cursor: pointer; text-decoration: none; }
+        .clickable-name:hover { text-decoration: underline; }
+
+        /* BADGES */
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; display: inline-block; }
+        .bg-green { background: #d4edda; color: #155724; } 
+        .bg-red { background: #f8d7da; color: #721c24; } 
+        .bg-yellow { background: #fff3cd; color: #856404; }
+        .bg-blue { background: #d1ecf1; color: #0c5460; }
+        
+        /* BUTTONS */
+        .btn { padding: 6px 14px; border-radius: 4px; border: none; cursor: pointer; font-size: 0.85rem; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; transition: 0.2s; }
+        .btn-primary { background: var(--secondary); color: white; } .btn-primary:hover { background: #2980b9; }
+        .btn-danger { background: var(--danger); color: white; } .btn-danger:hover { opacity: 0.9; }
+        .btn-info { background: var(--info); color: white; }
+        .btn-outline { border: 1px solid #bdc3c7; color: #7f8c8d; background: transparent; } .btn-outline:hover { background: #ecf0f1; }
+        .btn-sm { padding: 4px 8px; font-size: 0.75rem; }
+        
+        /* MODALS */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; }
+        .modal.active { display: flex; }
+        .modal-box { background: white; width: 550px; max-width: 95%; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; animation: slideDown 0.3s; }
+        @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .modal-head { padding: 15px 25px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; background: #f9f9f9; }
+        .modal-body { padding: 25px; max-height: 70vh; overflow-y: auto; }
+        .modal-foot { padding: 15px 25px; border-top: 1px solid #eee; text-align: right; background: #f9f9f9; }
+        
+        /* FORMS */
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.9rem; color: var(--primary); }
+        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.95rem; transition: 0.2s; }
+        .form-group input:focus, .form-group select:focus { border-color: var(--secondary); outline: none; box-shadow: 0 0 0 3px rgba(52,152,219,0.1); }
+        .form-readonly { background: #f0f2f5; color: #7f8c8d; cursor: not-allowed; }
+        
+        /* USER DETAILS MODAL */
+        .detail-row { display: flex; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px dashed #eee; padding-bottom: 8px; }
+        .detail-label { font-weight: bold; color: #7f8c8d; font-size: 0.9rem; }
+        .detail-value { font-weight: 600; color: #2c3e50; font-size: 0.95rem; }
+
+        /* ALERTS */
+        .alert { padding: 12px 20px; margin-bottom: 20px; border-radius: 4px; color: white; font-weight: 500; display: flex; align-items: center; gap: 10px; }
+        .alert-success { background: var(--success); } .alert-error { background: var(--danger); }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="logo"><i class="fas fa-graduation-cap"></i> Poly<span>Nova</span></div>
+        <div class="admin-info">
+            <div class="admin-avatar">{{ user.username|slice:":1"|upper }}</div>
+            <div style="font-weight:bold;">{{ user.first_name }} {{ user.last_name }}</div>
+            <div style="font-size: 0.8rem; color: #bdc3c7; margin-top:2px;">{% if user.is_superuser %}Super Admin{% else %}Modérateur{% endif %}</div>
+        </div>
+        <div class="menu">
+            <div class="menu-label">Principal</div>
+            <a href="#" class="active" data-target="dashboard"><i class="fas fa-tachometer-alt"></i> <span>Vue d'ensemble</span></a>
+            
+            <div class="menu-label">Gestion</div>
+            {% if is_superuser or perms.profiles.change_tutorprofile %}
+            <a href="#" data-target="validation"><i class="fas fa-user-check"></i> <span>Validations ({{ stats.tutors_pending }})</span></a>
+            {% endif %}
+            
+            <a href="#" data-target="geo"><i class="fas fa-globe"></i> <span>Pays & Config</span></a>
+            <a href="#" data-target="teachers"><i class="fas fa-chalkboard-teacher"></i> <span>Enseignants</span></a>
+            <a href="#" data-target="parents"><i class="fas fa-users"></i> <span>Parents</span></a>
+            
+            {% if is_superuser %}
+            <a href="#" data-target="admins"><i class="fas fa-user-shield"></i> <span>Administrateurs</span></a>
+            {% endif %}
+
+            <div class="menu-label">Activités</div>
+            <a href="#" data-target="requests"><i class="fas fa-list-ul"></i> <span>Demandes de cours</span></a>
+
+            <div class="menu-label">Système</div>
+            <a href="{% url 'home' %}" target="_blank"><i class="fas fa-external-link-alt"></i> <span>Voir le site</span></a>
+            <a href="{% url 'admin_logout' %}" style="color: #ffb8b8;"><i class="fas fa-sign-out-alt"></i> <span>Déconnexion</span></a>
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="top-header">
+            <div class="page-title">Tableau de Bord</div>
+            <a href="{% url 'admin_logout' %}" class="btn btn-outline btn-sm"><i class="fas fa-power-off"></i> Déconnexion</a>
+        </div>
+
+        <div class="content">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-error{% endif %}">
+                        <i class="fas {% if message.tags == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %}"></i>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="section active" id="dashboard">
+                <div class="stats-row">
+                    <div class="card">
+                        <div class="stat-info"><h3>{{ stats.parents_count }}</h3><p>Parents</p></div>
+                        <i class="fas fa-users stat-icon" style="color: var(--primary);"></i>
+                    </div>
+                    <div class="card success">
+                        <div class="stat-info"><h3>{{ stats.tutors_validated }}</h3><p>Profs Validés</p></div>
+                        <i class="fas fa-chalkboard-teacher stat-icon" style="color: var(--success);"></i>
+                    </div>
+                    <div class="card warning">
+                        <div class="stat-info"><h3>{{ stats.tutors_pending }}</h3><p>En Attente</p></div>
+                        <i class="fas fa-user-clock stat-icon" style="color: var(--warning);"></i>
+                    </div>
+                    <div class="card info">
+                        <div class="stat-info"><h3>{{ stats.active_requests }}</h3><p>Demandes</p></div>
+                        <i class="fas fa-list-alt stat-icon" style="color: var(--info);"></i>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-head"><h3><i class="fas fa-bolt mr-2"></i> Accès Rapides</h3></div>
+                    <div class="panel-body" style="padding:20px; display:flex; gap:15px;">
+                        <button onclick="document.querySelector('[data-target=geo]').click()" class="btn btn-outline">Gérer les Pays</button>
+                        <button onclick="document.querySelector('[data-target=teachers]').click()" class="btn btn-outline">Voir les Enseignants</button>
+                        {% if is_superuser %}
+                        <button onclick="openModal('addAdminModal')" class="btn btn-primary">Ajouter un Admin</button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="section" id="geo">
+                <div class="panel">
+                    <div class="panel-head">
+                        <h3>Pays Configurés</h3>
+                        <button class="btn btn-primary" onclick="openModal('addCountryModal')"><i class="fas fa-plus"></i> Ajouter Pays</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead><tr><th>Pays</th><th>Code</th><th>Devise</th><th>Statut</th><th>Actions</th></tr></thead>
+                            <tbody>
+                                {% for c in active_countries %}
+                                <tr>
+                                    <td><strong>{{ c.name }}</strong></td>
+                                    <td>{{ c.code }}</td>
+                                    <td>{{ c.currency_symbol }}</td>
+                                    <td>{% if c.is_active %}<span class="badge bg-green">Activé</span>{% else %}<span class="badge bg-red">Désactivé</span>{% endif %}</td>
+                                    <td>
+                                        <a href="{% url 'toggle_country' c.id %}" class="btn btn-outline btn-sm">{% if c.is_active %}Désactiver{% else %}Activer{% endif %}</a>
+                                        {% if is_superuser %}
+                                            <a href="{% url 'delete_country' c.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer ce pays ?')"><i class="fas fa-trash"></i></a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}<tr><td colspan="5" style="text-align:center; padding:20px;">Aucun pays configuré.</td></tr>{% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section" id="validation">
+                <div class="panel">
+                    <div class="panel-head"><h3>Enseignants en attente de validation</h3></div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead><tr><th>Nom</th><th>Email</th><th>Documents Reçus</th><th>Date</th><th>Action</th></tr></thead>
+                            <tbody>
+                                {% for tutor in pending_tutors %}
+                                <tr>
+                                    <td><span class="clickable-name" onclick="showUserDetail('{{ tutor.user.first_name }} {{ tutor.user.last_name }}', '{{ tutor.user.email }}', '{{ tutor.user.phone }}', 'Enseignant', 'En attente', '{{ tutor.created_at|date:'d/m/Y' }}')">{{ tutor.user.first_name }} {{ tutor.user.last_name }}</span></td>
+                                    <td>{{ tutor.user.email }}</td>
+                                    <td>
+                                        {% if tutor.cni_document %}<span class="badge bg-green">CNI</span>{% else %}<span class="badge bg-red">CNI</span>{% endif %}
+                                        {% if tutor.casier_judiciaire %}<span class="badge bg-green">Casier</span>{% else %}<span class="badge bg-red">Casier</span>{% endif %}
+                                    </td>
+                                    <td>{{ tutor.created_at|date:"d/m/Y" }}</td>
+                                    <td>
+                                        <a href="/admin/profiles/tutorprofile/{{ tutor.id }}/change/" target="_blank" class="btn btn-info btn-sm"><i class="fas fa-search"></i> Inspecter</a>
+                                    </td>
+                                </tr>
+                                {% empty %}<tr><td colspan="5" style="text-align:center; padding:20px;">Aucun dossier en attente.</td></tr>{% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section" id="teachers">
+                <div class="panel">
+                    <div class="panel-head"><h3>Tous les Enseignants</h3></div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead><tr><th>Nom</th><th>Email</th><th>Statut</th><th>Action</th></tr></thead>
+                            <tbody>
+                                {% for t in tutors_list %}
+                                <tr>
+                                    <td><span class="clickable-name" onclick="showUserDetail('{{ t.user.first_name }} {{ t.user.last_name }}', '{{ t.user.email }}', '{{ t.user.phone }}', 'Enseignant', '{{ t.status }}', '{{ t.created_at|date:'d/m/Y' }}')">{{ t.user.first_name }} {{ t.user.last_name }}</span></td>
+                                    <td>{{ t.user.email }}</td>
+                                    <td><span class="badge {% if t.status == 'validated' %}bg-green{% elif t.status == 'pending' %}bg-yellow{% else %}bg-red{% endif %}">{{ t.status }}</span></td>
+                                    <td>
+                                        <a href="/admin/profiles/tutorprofile/{{ t.id }}/change/" target="_blank" class="btn btn-outline btn-sm">Gérer</a>
+                                        {% if is_superuser %}<a href="{% url 'delete_user' t.user.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer ce compte ?')"><i class="fas fa-trash"></i></a>{% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section" id="parents">
+                <div class="panel">
+                    <div class="panel-head"><h3>Parents Inscrits</h3></div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead><tr><th>Nom</th><th>Email</th><th>Téléphone</th><th>Action</th></tr></thead>
+                            <tbody>
+                                {% for p in recent_parents %}
+                                <tr>
+                                    <td><span class="clickable-name" onclick="showUserDetail('{{ p.first_name }} {{ p.last_name }}', '{{ p.email }}', '{{ p.phone }}', 'Parent', 'Actif', '{{ p.date_joined|date:'d/m/Y' }}')">{{ p.first_name }} {{ p.last_name }}</span></td>
+                                    <td>{{ p.email }}</td>
+                                    <td>{{ p.phone }}</td>
+                                    <td>
+                                        <a href="/admin/accounts/customuser/{{ p.id }}/change/" target="_blank" class="btn btn-outline btn-sm">Gérer</a>
+                                        {% if is_superuser %}<a href="{% url 'delete_user' p.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer ce compte ?')"><i class="fas fa-trash"></i></a>{% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section" id="requests">
+                <div class="panel">
+                    <div class="panel-head"><h3>Demandes de Cours</h3></div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead><tr><th>Date</th><th>Parent</th><th>Besoin</th><th>Ville</th><th>Budget</th><th>Statut</th><th>Action</th></tr></thead>
+                            <tbody>
+                                {% for r in recent_requests %}
+                                <tr>
+                                    <td style="color:#95a5a6; font-size:0.8rem;">{{ r.created_at|date:"d/m/Y" }}</td>
+                                    <td>{{ r.parent.first_name }} {{ r.parent.last_name }}</td>
+                                    <td><span class="badge bg-blue">{{ r.level.name }}</span> {% for s in r.subjects.all|slice:":1" %}{{ s.name }}{% endfor %}</td>
+                                    <td>{{ r.city.name }}</td>
+                                    <td style="font-weight:bold;">{{ r.get_budget_range_display }}</td>
+                                    <td><span class="badge {% if r.status == 'active' %}bg-green{% else %}bg-red{% endif %}">{{ r.get_status_display }}</span></td>
+                                    <td>
+                                        {% if is_superuser %}
+                                            <a href="{% url 'delete_request' r.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer cette demande ?')"><i class="fas fa-trash"></i></a>
+                                        {% else %}
+                                            <span style="color:#bdc3c7;">--</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}<tr><td colspan="7" style="text-align:center; padding:20px;">Aucune demande.</td></tr>{% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            {% if is_superuser %}
+            <div class="section" id="admins">
+                <div class="panel">
+                    <div class="panel-head">
+                        <h3>Administrateurs</h3>
+                        <button class="btn btn-primary btn-sm" onclick="openModal('addAdminModal')"><i class="fas fa-plus"></i> Ajouter</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead><tr><th>Email</th><th>Rôle</th><th>Action</th></tr></thead>
+                            <tbody>
+                                {% for a in admin_users %}
+                                <tr>
+                                    <td>{{ a.email }}</td>
+                                    <td>{% if a.is_superuser %}<span class="badge bg-green">Super Admin</span>{% else %}<span class="badge bg-yellow">Sous-Admin</span>{% endif %}</td>
+                                    <td>
+                                        {% if not a.is_superuser %}
+                                            <a href="{% url 'delete_sub_admin' a.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer cet admin ?')"><i class="fas fa-trash"></i></a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+    <div class="modal" id="addCountryModal">
+        <div class="modal-box">
+            <form action="{% url 'add_country' %}" method="POST">
+                {% csrf_token %}
+                <div class="modal-head"><h3>Ajouter un Pays</h3><i class="fas fa-times cursor-pointer" onclick="closeModal('addCountryModal')"></i></div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Sélectionner un pays (Auto-remplissage)</label>
+                        <select id="countrySelect" onchange="fillCountryInfo()">
+                            <option value="">-- Choisir --</option>
+                        </select>
+                    </div>
+                    <input type="hidden" name="name" id="countryNameInput">
+                    <div class="form-grid">
+                        <div class="form-group"><label>Code ISO</label><input type="text" name="code" id="countryCodeInput" readonly class="form-readonly"></div>
+                        <div class="form-group"><label>Devise</label><input type="text" name="currency" id="countryCurrencyInput" readonly class="form-readonly"></div>
+                    </div>
+                </div>
+                <div class="modal-foot">
+                    <button type="button" class="btn btn-outline" onclick="closeModal('addCountryModal')">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Ajouter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if is_superuser %}
+    <div class="modal" id="addAdminModal">
+        <div class="modal-box">
+            <form action="{% url 'create_sub_admin' %}" method="POST">
+                {% csrf_token %}
+                <div class="modal-head"><h3>Ajouter Sous-Admin</h3><i class="fas fa-times cursor-pointer" onclick="closeModal('addAdminModal')"></i></div>
+                <div class="modal-body">
+                    <div class="form-grid">
+                        <div class="form-group"><label>Prénom</label><input type="text" name="first_name" required></div>
+                        <div class="form-group"><label>Nom</label><input type="text" name="last_name" required></div>
+                    </div>
+                    <div class="form-group"><label>Email</label><input type="email" name="email" required></div>
+                    <div class="form-group"><label>Mot de passe</label><input type="password" name="password" required></div>
+                    <div style="background:#f9f9f9; padding:10px; border-radius:4px;">
+                        <label style="margin-bottom:10px; display:block;">Permissions :</label>
+                        <div style="margin-bottom:5px;"><input type="checkbox" name="perm_validation" checked> Validation Enseignants</div>
+                        <div><input type="checkbox" name="perm_users"> Gestion Utilisateurs</div>
+                    </div>
+                </div>
+                <div class="modal-foot">
+                    <button type="button" class="btn btn-outline" onclick="closeModal('addAdminModal')">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Créer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="modal" id="viewUserModal">
+        <div class="modal-box">
+            <div class="modal-head"><h3>Détails Utilisateur</h3><i class="fas fa-times cursor-pointer" onclick="closeModal('viewUserModal')"></i></div>
+            <div class="modal-body">
+                <div style="text-align:center; margin-bottom:20px;">
+                    <div style="width:70px; height:70px; background:var(--secondary); color:white; font-size:1.8rem; font-weight:bold; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto;" id="detailAvatar"></div>
+                    <h2 id="detailName" style="margin-top:10px; color:var(--primary); font-size:1.2rem;"></h2>
+                    <span id="detailRole" class="badge bg-blue"></span>
+                </div>
+                <div class="detail-row"><span class="detail-label">Email</span><span class="detail-value" id="detailEmail"></span></div>
+                <div class="detail-row"><span class="detail-label">Téléphone</span><span class="detail-value" id="detailPhone"></span></div>
+                <div class="detail-row"><span class="detail-label">Statut</span><span class="detail-value" id="detailStatus"></span></div>
+                <div class="detail-row"><span class="detail-label">Inscrit le</span><span class="detail-value" id="detailDate"></span></div>
+            </div>
+            <div class="modal-foot">
+                <button type="button" class="btn btn-primary" onclick="closeModal('viewUserModal')">Fermer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // NAVIGATION TAB
+            const menuLinks = document.querySelectorAll('.menu a[data-target]');
+            const contentSections = document.querySelectorAll('.section');
+            const pageTitle = document.querySelector('.page-title');
+
+            menuLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('data-target');
+                    const section = document.getElementById(targetId);
+
+                    if (section) {
+                        menuLinks.forEach(l => l.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        contentSections.forEach(s => s.classList.remove('active'));
+                        section.classList.add('active');
+                        
+                        pageTitle.textContent = this.textContent.trim();
+                    }
+                });
+            });
+
+            // DONNÉES PAYS
+            const worldCountries = [
+                {name: "Côte d'Ivoire", code: "CI", currency: "XOF"}, {name: "Sénégal", code: "SN", currency: "XOF"},
+                {name: "Cameroun", code: "CM", currency: "XAF"}, {name: "Mali", code: "ML", currency: "XOF"},
+                {name: "Burkina Faso", code: "BF", currency: "XOF"}, {name: "Togo", code: "TG", currency: "XOF"},
+                {name: "Bénin", code: "BJ", currency: "XOF"}, {name: "France", code: "FR", currency: "EUR"},
+                {name: "Gabon", code: "GA", currency: "XAF"}, {name: "Congo (RDC)", code: "CD", currency: "CDF"},
+                {name: "Maroc", code: "MA", currency: "MAD"}, {name: "Tunisie", code: "TN", currency: "TND"}
+            ];
+
+            const countrySelect = document.getElementById('countrySelect');
+            if (countrySelect) {
+                worldCountries.forEach(c => {
+                    const option = document.createElement('option');
+                    option.value = c.code;
+                    option.textContent = c.name;
+                    countrySelect.appendChild(option);
+                });
+            }
+
+            window.fillCountryInfo = function() {
+                const code = countrySelect.value;
+                const country = worldCountries.find(c => c.code === code);
+                if (country) {
+                    document.getElementById('countryNameInput').value = country.name;
+                    document.getElementById('countryCodeInput').value = country.code;
+                    document.getElementById('countryCurrencyInput').value = country.currency;
+                }
+            };
+
+            // MODALS & USER DETAILS
+            window.openModal = function(id) { document.getElementById(id).classList.add('active'); }
+            window.closeModal = function(id) { document.getElementById(id).classList.remove('active'); }
+            
+            window.showUserDetail = function(name, email, phone, role, status, date) {
+                document.getElementById('detailName').textContent = name;
+                document.getElementById('detailAvatar').textContent = name.charAt(0).toUpperCase();
+                document.getElementById('detailEmail').textContent = email;
+                document.getElementById('detailPhone').textContent = phone || 'Non renseigné';
+                document.getElementById('detailRole').textContent = role;
+                document.getElementById('detailStatus').textContent = status;
+                document.getElementById('detailDate').textContent = date;
+                openModal('viewUserModal');
+            }
+
+            window.onclick = function(e) {
+                if (e.target.classList.contains('modal')) e.target.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>

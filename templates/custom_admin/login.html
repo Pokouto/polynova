@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion Administration - PolyNova</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --danger: #e74c3c;
+        }
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--primary);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        /* Animation de fond subtile */
+        .bg-pattern {
+            position: absolute; width: 100%; height: 100%;
+            background-image: radial-gradient(#34495e 1px, transparent 1px);
+            background-size: 20px 20px; opacity: 0.1; z-index: 0;
+        }
+
+        .login-box {
+            background: white;
+            width: 400px;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            position: relative; z-index: 10;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 1.8rem; font-weight: 800; color: var(--primary);
+            margin-bottom: 5px;
+        }
+        .logo span { color: var(--secondary); }
+        .subtitle { color: #7f8c8d; font-size: 0.9rem; margin-bottom: 30px; }
+
+        .form-group { margin-bottom: 20px; text-align: left; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--primary); margin-bottom: 5px; }
+        .input-group { position: relative; }
+        .input-group i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #bdc3c7; }
+        .input-group input {
+            width: 100%; padding: 12px 12px 12px 40px;
+            border: 1px solid #e0e0e0; border-radius: 4px;
+            font-size: 1rem; transition: 0.2s;
+            box-sizing: border-box; /* Important pour ne pas dépasser */
+        }
+        .input-group input:focus { border-color: var(--secondary); outline: none; }
+
+        .btn-login {
+            width: 100%; padding: 12px;
+            background: var(--secondary); color: white;
+            border: none; border-radius: 4px;
+            font-size: 1rem; font-weight: 600;
+            cursor: pointer; transition: 0.2s;
+        }
+        .btn-login:hover { background: #2980b9; }
+
+        .alert {
+            background: #f8d7da; color: #721c24;
+            padding: 10px; border-radius: 4px; font-size: 0.85rem;
+            margin-bottom: 20px; border: 1px solid #f5c6cb;
+        }
+        
+        .footer-link { margin-top: 20px; font-size: 0.85rem; }
+        .footer-link a { color: #95a5a6; text-decoration: none; }
+        .footer-link a:hover { color: var(--primary); }
+    </style>
+</head>
+<body>
+
+    <div class="bg-pattern"></div>
+
+    <div class="login-box">
+        <div class="logo"><i class="fas fa-graduation-cap"></i> Poly<span>Nova</span></div>
+        <div class="subtitle">Accès Réservé au Staff</div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert"><i class="fas fa-exclamation-circle"></i> {{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Identifiant / Email</label>
+                <div class="input-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" name="username" required placeholder="admin@polynova.ci">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Mot de passe</label>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" name="password" required placeholder="••••••••">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-login">Se connecter au Panel</button>
+        </form>
+
+        <div class="footer-link">
+            <a href="{% url 'home' %}">← Retour au site public</a>
+        </div>
+    </div>
+
+</body>
+</html>

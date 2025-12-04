@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="bg-gray-50 min-h-screen py-10">
+    <div class="max-w-4xl mx-auto px-4">
+        <h1 class="text-2xl font-bold text-gray-900 mb-6 flex items-center"><i class="fas fa-envelope text-blue-600 mr-3"></i> Ma Messagerie</h1>
+        <div class="bg-white shadow rounded-lg overflow-hidden border border-gray-200">
+            {% if threads_data %}
+                <ul class="divide-y divide-gray-200">
+                    {% for item in threads_data %}
+                        <li><a href="{% url 'thread_detail' item.thread.pk %}" class="block hover:bg-blue-50 transition p-4 flex items-center">
+                            <div class="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-lg mr-4">{{ item.other.username|slice:":1"|upper }}</div>
+                            <div class="flex-1"><div class="flex justify-between"><p class="font-bold text-gray-900">{{ item.other.first_name }} {{ item.other.last_name }}</p><p class="text-xs text-gray-500">{{ item.thread.updated_at|timesince }}</p></div><p class="text-sm text-gray-600 truncate">{% if item.last_msg %}{{ item.last_msg.content }}{% else %}Nouvelle conversation{% endif %}</p></div>
+                        </a></li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div class="text-center py-16"><i class="far fa-comments text-4xl text-gray-300 mb-4"></i><h3 class="text-lg font-medium">Aucune conversation</h3><p class="text-gray-500">Contactez un prof ou répondez à une annonce.</p></div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

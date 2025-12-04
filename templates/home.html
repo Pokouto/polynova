@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="relative bg-blue-700 text-white overflow-hidden">
+    <div class="absolute inset-0 bg-black opacity-50 z-0"></div>
+    <div class="absolute inset-0 z-0" style="background-image: url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'); background-size: cover; background-position: center; mix-blend-mode: overlay;"></div>
+    <div class="relative z-10 max-w-7xl mx-auto px-4 py-24 sm:py-32 lg:px-8 text-center">
+        <h1 class="text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl mb-6">Plateforme de soutien scolaire<br><span class="text-blue-200">en Côte d'Ivoire</span></h1>
+        <p class="mt-4 text-xl text-blue-100 max-w-3xl mx-auto mb-10">Mise en relation Parents ↔ Enseignants vérifiés pour des cours à domicile ou en ligne, du primaire au lycée.</p>
+        <div class="flex flex-col sm:flex-row justify-center gap-4">
+            <a href="{% url 'create_request' %}" class="px-8 py-4 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-full shadow-lg transition transform hover:-translate-y-1 text-lg"><i class="fas fa-edit mr-2"></i> Trouver un enseignant</a>
+            <a href="{% url 'tutor_list' %}" class="px-8 py-4 bg-white text-blue-900 font-bold rounded-full shadow-lg hover:bg-gray-100 transition transform hover:-translate-y-1 text-lg"><i class="fas fa-search mr-2"></i> Voir l'annuaire</a>
+        </div>
+    </div>
+</section>
+
+<section class="py-16 bg-white">
+    <div class="container">
+        <div class="text-center mb-12"><h2 class="text-3xl font-extrabold text-gray-900">Comment ça marche ?</h2></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <div class="bg-gray-50 p-8 rounded-xl border border-gray-100 shadow-sm">
+                <div class="flex items-center mb-6"><div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xl mr-4"><i class="fas fa-user-friends"></i></div><h3 class="text-2xl font-bold text-gray-900">Pour les Parents</h3></div>
+                <ul class="space-y-4 text-gray-600 text-lg">
+                    <li class="flex items-start"><span class="font-bold text-blue-500 mr-3">1.</span> Déposez une demande en quelques minutes.</li>
+                    <li class="flex items-start"><span class="font-bold text-blue-500 mr-3">2.</span> Recevez des propositions de professeurs vérifiés.</li>
+                    <li class="flex items-start"><span class="font-bold text-blue-500 mr-3">3.</span> Choisissez un professeur et démarrez les cours.</li>
+                </ul>
+            </div>
+            <div class="bg-gray-50 p-8 rounded-xl border border-gray-100 shadow-sm">
+                <div class="flex items-center mb-6"><div class="w-12 h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-xl mr-4"><i class="fas fa-chalkboard-teacher"></i></div><h3 class="text-2xl font-bold text-gray-900">Pour les Enseignants</h3></div>
+                <ul class="space-y-4 text-gray-600 text-lg">
+                    <li class="flex items-start"><span class="font-bold text-green-500 mr-3">1.</span> Créez un profil complet et fournissez vos documents.</li>
+                    <li class="flex items-start"><span class="font-bold text-green-500 mr-3">2.</span> Prenez un abonnement 30 jours (3 000 F).</li>
+                    <li class="flex items-start"><span class="font-bold text-green-500 mr-3">3.</span> Payez uniquement par contact parent obtenu.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-16 bg-blue-50">
+    <div class="container">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-extrabold text-blue-900">Enseignants 100% Vérifiés</h2>
+            <p class="mt-4 text-lg text-blue-700 max-w-2xl mx-auto">Pour la sécurité de vos enfants, nous contrôlons manuellement chaque dossier avant validation.</p>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-6 text-center">
+            <div class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition"><i class="fas fa-id-card text-3xl text-blue-500 mb-3"></i><p class="font-semibold text-sm">Pièce d'identité</p></div>
+            <div class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition"><i class="fas fa-graduation-cap text-3xl text-blue-500 mb-3"></i><p class="font-semibold text-sm">Diplômes</p></div>
+            <div class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition"><i class="fas fa-file-contract text-3xl text-blue-500 mb-3"></i><p class="font-semibold text-sm">Casier Judiciaire</p></div>
+            <div class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition"><i class="fas fa-camera text-3xl text-blue-500 mb-3"></i><p class="font-semibold text-sm">Selfie KYC</p></div>
+            <div class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition"><i class="fas fa-file-alt text-3xl text-blue-500 mb-3"></i><p class="font-semibold text-sm">CV</p></div>
+            <div class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition"><i class="fas fa-envelope-open-text text-3xl text-blue-500 mb-3"></i><p class="font-semibold text-sm">Motivation</p></div>
+            <div class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition"><i class="fas fa-map-marker-alt text-3xl text-blue-500 mb-3"></i><p class="font-semibold text-sm">Domicile</p></div>
+        </div>
+    </div>
+</section>
+
+<section class="py-16 bg-white">
+    <div class="container">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-extrabold text-gray-900">Nos Tarifs - Côte d'Ivoire</h2>
+            <p class="text-gray-500 mt-2">Transparence totale. Aucun frais caché.</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <div class="border border-gray-200 rounded-xl p-8 shadow-sm hover:shadow-lg transition relative overflow-hidden">
+                <div class="absolute top-0 right-0 bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">PARENTS</div>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Achat Contact</h3>
+                <div class="text-4xl font-extrabold text-blue-600 mb-4">1 500 <span class="text-lg text-gray-500 font-normal">F CFA</span></div>
+                <p class="text-gray-500 text-sm mb-6">Prix de départ pour débloquer le numéro d'un professeur (Primaire).</p>
+                <ul class="space-y-3 text-sm text-gray-600 mb-8">
+                    <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Primaire : <strong>1 500 F</strong></li>
+                    <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Collège : <strong>2 000 F</strong></li>
+                    <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Lycée : <strong>3 500 F</strong></li>
+                    <li class="flex items-center"><i class="fas fa-star text-orange-500 mr-2"></i> Examens : <strong>5 000 F</strong></li>
+                </ul>
+                <a href="{% url 'tutor_list' %}" class="block w-full py-3 bg-blue-600 text-white font-bold rounded-lg text-center hover:bg-blue-700 transition">Voir les profs</a>
+            </div>
+
+            <div class="border-2 border-green-500 rounded-xl p-8 shadow-lg transform md:-translate-y-4 bg-white relative">
+                <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-green-500 text-white px-4 py-1 rounded-full text-sm font-bold shadow">RECOMMANDÉ</div>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Abonnement Prof</h3>
+                <div class="text-4xl font-extrabold text-green-600 mb-4">3 000 <span class="text-lg text-gray-500 font-normal">F CFA</span></div>
+                <p class="text-gray-500 text-sm mb-6">Valable 30 jours. Indispensable pour être visible et recevoir des élèves.</p>
+                <ul class="space-y-3 text-sm text-gray-600 mb-8">
+                    <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Profil visible dans l'annuaire</li>
+                    <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Accès aux demandes de cours</li>
+                    <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Badge "Vérifié" (après contrôle)</li>
+                    <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Support prioritaire</li>
+                </ul>
+                <a href="{% url 'register' %}" class="block w-full py-3 bg-green-600 text-white font-bold rounded-lg text-center hover:bg-green-700 transition">Devenir enseignant</a>
+            </div>
+
+            <div class="border border-gray-200 rounded-xl p-8 shadow-sm hover:shadow-lg transition bg-gray-50">
+                <h3 class="text-xl font-bold text-gray-900 mb-4">Moyens de Paiement</h3>
+                <p class="text-gray-600 text-sm mb-6">Nous acceptons les paiements mobiles sécurisés les plus courants en Côte d'Ivoire.</p>
+                <div class="space-y-4">
+                    <div class="flex items-center bg-white p-3 rounded shadow-sm"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Orange_logo.svg/1200px-Orange_logo.svg.png" class="h-6 mr-3"> Orange Money</div>
+                    <div class="flex items-center bg-white p-3 rounded shadow-sm"><img src="https://upload.wikimedia.org/wikipedia/commons/e/e9/Mtn-logo.svg" class="h-6 mr-3"> MTN Mobile Money</div>
+                    <div class="flex items-center bg-white p-3 rounded shadow-sm"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Moov_Africa_logo.svg/1200px-Moov_Africa_logo.svg.png" class="h-6 mr-3"> Moov Money</div>
+                    <div class="flex items-center bg-white p-3 rounded shadow-sm"><i class="fab fa-cc-visa text-blue-800 text-2xl mr-3"></i> Carte Bancaire</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="bg-gray-900 py-16">
+    <div class="container text-center">
+        <h2 class="text-3xl font-extrabold text-white sm:text-4xl">Prêt à commencer ?</h2>
+        <p class="mt-4 text-lg leading-6 text-gray-300">Rejoignez dès aujourd'hui la communauté PolyNova.</p>
+        <div class="mt-8 flex justify-center gap-4">
+            <a href="{% url 'register' %}" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-gray-900 bg-white hover:bg-gray-100">Créer un compte</a>
+        </div>
+    </div>
+</section>
+{% endblock %}
