@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
 # 2. Sécurité
 SECRET_KEY = 'django-insecure-remplace-moi-vite-en-prod-avec-une-cle-secrete'
 DEBUG = True
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # 3. Applications installées
 INSTALLED_APPS = [
