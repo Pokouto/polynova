@@ -1,21 +1,151 @@
 {% extends "base.html" %}
+
 {% block content %}
-<div class="flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gray-50 h-full">
-    <div class="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">Créer un compte</h2>
-    </div>
-    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 border border-gray-200">
-            <form class="space-y-6" action="" method="POST">
-                {% csrf_token %}
-                {% if form.errors %}<div class="bg-red-50 border-l-4 border-red-400 p-4 mb-4"><p class="text-sm text-red-700">Erreur dans le formulaire.</p></div>{% endif %}
-                {% for field in form %}
-                <div><label class="block text-sm font-medium text-gray-700 mb-1">{{ field.label }}</label><div class="mt-1">{{ field }}</div>{% if field.help_text %}<p class="mt-1 text-xs text-gray-500">{{ field.help_text }}</p>{% endif %}</div>
-                {% endfor %}
-                <div><button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">S'inscrire</button></div>
-            </form>
-            <div class="mt-6 text-center"><a href="{% url 'login' %}" class="font-medium text-blue-600 hover:text-blue-500">Déjà inscrit ? Connexion</a></div>
+<div class="min-h-[calc(100vh-80px)] flex items-center justify-center bg-gray-50 py-10 px-4 sm:px-6 lg:px-8 auth-page-wrapper">
+    
+    <div class="max-w-md w-full space-y-8 bg-white p-10 rounded-2xl shadow-xl border border-gray-100 relative auth-form-container">
+        
+        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 to-blue-700 rounded-t-2xl"></div>
+
+        <div class="text-center">
+            <div class="mx-auto h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                <i class="fas fa-user-plus text-blue-600 text-xl"></i>
+            </div>
+            <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight">Inscription</h2>
+            <p class="mt-2 text-sm text-gray-500">Rejoignez la communauté PolyNova.</p>
         </div>
+
+        <form class="mt-8 space-y-5" action="" method="POST" novalidate>
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+                <div class="bg-red-50 border border-red-200 rounded-lg p-3 text-center">
+                    <p class="text-xs text-red-600 font-bold flex items-center justify-center">
+                        <i class="fas fa-exclamation-circle mr-2"></i> {{ form.non_field_errors.0 }}
+                    </p>
+                </div>
+            {% endif %}
+
+            <div class="space-y-5">
+                {% for field in form %}
+                <div class="relative group">
+                    <label for="{{ field.id_for_label }}" class="block text-xs font-bold text-gray-600 uppercase mb-1.5 ml-1 tracking-wide">
+                        {{ field.label }}
+                    </label>
+                    
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
+                            <span class="text-gray-400 text-sm group-focus-within:text-blue-500 transition-colors">
+                                {% if 'username' in field.name %}<i class="fas fa-user"></i>
+                                {% elif 'email' in field.name %}<i class="fas fa-envelope"></i>
+                                {% elif 'phone' in field.name %}<i class="fas fa-phone"></i>
+                                {% elif 'password' in field.name %}<i class="fas fa-lock"></i>
+                                {% elif 'role' in field.name %}<i class="fas fa-users-cog"></i>
+                                {% else %}<i class="fas fa-pen"></i>{% endif %}
+                            </span>
+                        </div>
+                        
+                        {% if field.name == 'role' %}
+                            {{ field }}
+                            <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                                <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
+                            </div>
+                        {% else %}
+                            <input 
+                                type="{{ field.field.widget.input_type|default:'text' }}" 
+                                name="{{ field.name }}" 
+                                id="{{ field.id_for_label }}" 
+                                {% if field.value %}value="{{ field.value }}"{% endif %} 
+                                class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm transition duration-200 ease-in-out shadow-sm" 
+                                placeholder="{{ field.label }}" 
+                                {% if field.field.required %}required{% endif %}
+                            >
+                        {% endif %}
+
+                        {% if 'password' in field.name %}
+                            <button type="button" onclick="toggleRegisterPassword('{{ field.id_for_label }}', 'icon_{{ field.id_for_label }}')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-blue-600 cursor-pointer focus:outline-none z-20">
+                                <i class="fas fa-eye" id="icon_{{ field.id_for_label }}"></i>
+                            </button>
+                        {% endif %}
+                    </div>
+                    
+                    {% if field.errors %}
+                        <p class="mt-1 text-xs text-red-500 ml-1 flex items-center animate-pulse">
+                            <i class="fas fa-times-circle mr-1"></i> {{ field.errors.0 }}
+                        </p>
+                    {% endif %}
+                    
+                    {% if field.help_text %}
+                        <div class="mt-1 ml-1 help-text-custom">{{ field.help_text|safe }}</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="pt-4">
+                <button type="submit" class="group relative w-full flex justify-center py-3.5 px-4 border border-transparent text-sm font-bold rounded-full text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5">
+                    <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                        <i class="fas fa-check text-blue-400 group-hover:text-blue-300 transition ease-in-out duration-150"></i>
+                    </span> 
+                    S'inscrire maintenant
+                </button>
+            </div>
+        </form>
+
+        <div class="text-center mt-6 pt-6 border-t border-gray-100">
+            <p class="text-sm text-gray-600">Déjà inscrit ? <a href="{% url 'login' %}" class="font-bold text-blue-600 hover:text-blue-800 transition ml-1">Connectez-vous</a></p>
+        </div>
+        
+        <style>
+            /* --- CORRECTION DU CONFLIT --- */
+            /* On cible UNIQUEMENT les select qui sont DANS la carte du formulaire (.auth-form-container) */
+            .auth-form-container select {
+                appearance: none; 
+                -webkit-appearance: none; 
+                -moz-appearance: none;
+                
+                /* Padding gauche important pour ne pas que le texte touche l'icône */
+                padding-left: 2.5rem; 
+                
+                width: 100%; 
+                height: 46px; 
+                border: 1px solid #d1d5db; 
+                border-radius: 0.5rem; 
+                background-color: #f9fafb; 
+                font-size: 0.875rem; 
+                color: #111827; 
+                cursor: pointer; 
+            }
+            
+            .auth-form-container select:focus { 
+                background-color: white; 
+                border-color: var(--primary); 
+                outline: none; 
+                box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5); 
+            }
+
+            /* Avertissements discrets */
+            .help-text-custom { font-size: 0.65rem !important; color: #9ca3af !important; line-height: 1.2; }
+            .help-text-custom ul { list-style-type: none; padding: 0; margin: 0; }
+            .help-text-custom li { display: inline-block; margin-right: 8px; }
+            .help-text-custom li::before { content: "• "; color: #d1d5db; }
+        </style>
     </div>
 </div>
+
+<script>
+    function toggleRegisterPassword(inputId, iconId) {
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+        if (input.type === "password") {
+            input.type = "text";
+            icon.classList.remove("fa-eye");
+            icon.classList.add("fa-eye-slash");
+        } else {
+            input.type = "password";
+            icon.classList.remove("fa-eye-slash");
+            icon.classList.add("fa-eye");
+        }
+    }
+</script>
 {% endblock %}

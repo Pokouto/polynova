@@ -12,12 +12,10 @@ from .forms import RequestForm, ReviewForm
 
 def tutor_list(request):
     """
-    Affiche l'annuaire des professeurs avec filtres (Matière, Niveau, Ville).
+    Affiche l'annuaire des professeurs avec filtres.
     """
-    # On ne prend QUE les profs validés
     tutors = TutorProfile.objects.filter(status='validated')
 
-    # Récupération des filtres depuis l'URL
     subject_id = request.GET.get('subject')
     city_id = request.GET.get('city')
     level_id = request.GET.get('level')
@@ -28,10 +26,9 @@ def tutor_list(request):
     if level_id:
         tutors = tutors.filter(levels__id=level_id)
         
-    # Note: Si on avait lié la ville au profil pour le filtre, on l'ajouterait ici
+    # Note: Pour filtrer par ville, il faudrait lier City au TutorProfile dans le futur
     # if city_id: tutors = tutors.filter(city_id=city_id)
 
-    # Listes pour les menus déroulants
     subjects = Subject.objects.all()
     levels = Level.objects.all()
     cities = City.objects.all()
@@ -47,32 +44,24 @@ def tutor_list(request):
 
 def tutor_detail(request, pk):
     """
-    Affiche le profil public complet d'un prof.
-    Gère :
-    1. Le Paywall (Contact masqué/affiché)
-    2. L'affichage des avis
-    3. Le formulaire de dépôt d'avis (si contact débloqué)
+    Affiche le profil public complet d'un prof avec Paywall et Avis.
     """
     tutor = get_object_or_404(TutorProfile, pk=pk, status='validated')
     
-    # --- 1. Gestion du Paywall ---
+    # --- Gestion du Paywall ---
     is_unlocked = False
     if request.user.is_authenticated:
-        if request.user == tutor.user:
-            is_unlocked = True
-        elif request.user.is_superuser:
+        if request.user == tutor.user or request.user.is_superuser:
             is_unlocked = True
         elif ContactUnlock.objects.filter(parent_user=request.user, tutor_profile=tutor).exists():
             is_unlocked = True
 
-    # --- 2. Gestion des Avis (Affichage) ---
+    # --- Gestion des Avis ---
     reviews = tutor.reviews.all()
     avg_rating = reviews.aggregate(Avg('rating'))['rating__avg'] or 0
     
-    # --- 3. Gestion du Formulaire d'Avis (Ajout) ---
+    # Formulaire d'avis (si autorisé)
     review_form = None
-    
-    # Un parent ne peut noter que s'il est connecté ET a débloqué le contact
     if request.user.is_authenticated and request.user.role == 'parent' and is_unlocked:
         if request.method == 'POST' and 'submit_review' in request.POST:
             review_form = ReviewForm(request.POST)
@@ -90,7 +79,7 @@ def tutor_detail(request, pk):
         'tutor': tutor,
         'is_unlocked': is_unlocked,
         'reviews': reviews,
-        'avg_rating': round(avg_rating, 1), # Arrondi à 1 décimale (ex: 4.5)
+        'avg_rating': round(avg_rating, 1),
         'review_count': reviews.count(),
         'review_form': review_form,
     }
@@ -100,25 +89,51 @@ def tutor_detail(request, pk):
 @login_required
 def create_request(request):
     """
-    Permet à un parent de poster une nouvelle demande de cours.
+    Permet à un parent de poster une nouvelle demande.
+    Applique l'algorithme de SCORING pour qualifier le lead.
     """
-    # Sécurité : Seuls les parents (ou admin) peuvent poster
     is_parent = hasattr(request.user, 'role') and request.user.role == 'parent'
-    is_admin = request.user.is_superuser
-
-    if not is_parent and not is_admin:
+    if not is_parent and not request.user.is_superuser:
         messages.error(request, "Seuls les parents peuvent déposer des demandes.")
         return redirect('home')
 
     if request.method == 'POST':
         form = RequestForm(request.POST)
         if form.is_valid():
-            course_req = form.save(commit=False)
-            course_req.parent = request.user
-            course_req.save()
-            form.save_m2m() # Sauvegarde des relations ManyToMany (Matières)
+            req = form.save(commit=False)
+            req.parent = request.user
             
-            messages.success(request, "Votre demande a été publiée ! Les professeurs vont vous contacter.")
+            # --- ALGORITHME DE SCORING (Règles CDC) ---
+            # 1. Budget suffisant (>= 30 000)
+            strong_budget = req.budget_range in ['standard', 'high', 'premium']
+            
+            # 2. Délai court (Immédiat ou < 4 semaines)
+            strong_start = req.start_time in ['asap', '1-4weeks']
+            
+            # 3. Intention déclarée
+            wants_to_start = req.intention == 'start'
+
+            # Route A : Intention Forte
+            if wants_to_start and strong_start and strong_budget:
+                req.qualification = "Intention Forte"
+                req.save()
+                form.save_m2m()
+                messages.success(request, "Excellent ! Votre demande est prioritaire. Les enseignants vont vous contacter.")
+            
+            # Route B : Intention Tiède
+            elif (req.intention == 'info' or req.start_time == 'later') and strong_budget:
+                req.qualification = "Intention Tiède"
+                req.save()
+                form.save_m2m()
+                messages.info(request, "Demande enregistrée. Vous recevrez des informations par email.")
+            
+            # Route C : Budget Faible / Autre
+            else:
+                req.qualification = "Budget Limité / Autre"
+                req.save()
+                form.save_m2m()
+                messages.warning(request, "Votre budget est un peu bas pour trouver rapidement un professeur, mais votre annonce est en ligne.")
+
             return redirect('dashboard')
     else:
         form = RequestForm()
@@ -129,11 +144,10 @@ def create_request(request):
 @login_required
 def edit_request(request, pk):
     """
-    Permet au parent de modifier sa propre demande existante.
+    Permet au parent de modifier sa propre demande.
     """
     course_req = get_object_or_404(CourseRequest, pk=pk)
 
-    # Sécurité : On vérifie que c'est bien le propriétaire
     if course_req.parent != request.user:
         messages.error(request, "Vous ne pouvez pas modifier cette demande.")
         return redirect('dashboard')
@@ -142,12 +156,11 @@ def edit_request(request, pk):
         form = RequestForm(request.POST, instance=course_req)
         if form.is_valid():
             req = form.save(commit=False)
-            # Si la demande était expirée/fermée, on la réactive en cas de modification
             if req.status != 'active':
-                req.status = 'active'
+                req.status = 'active' # Réactivation si modifiée
             req.save()
             form.save_m2m()
-            messages.success(request, "Votre demande a été mise à jour et validée !")
+            messages.success(request, "Votre demande a été mise à jour.")
             return redirect('dashboard')
     else:
         form = RequestForm(instance=course_req)
@@ -161,25 +174,23 @@ def edit_request(request, pk):
 @login_required
 def request_list(request):
     """
-    Place de marché pour les ENSEIGNANTS.
-    Affiche toutes les demandes actives des parents.
+    Place de marché pour les ENSEIGNANTS (Voir les offres).
     """
-    # Sécurité : Seuls les profs (ou admins) peuvent voir ça
     is_tutor = hasattr(request.user, 'role') and request.user.role == 'tutor'
     if not is_tutor and not request.user.is_superuser:
         messages.error(request, "Accès réservé aux enseignants.")
         return redirect('home')
 
-    # On récupère toutes les demandes ACTIVES, triées par date récente
+    # Récupère les demandes ACTIVES
     requests = CourseRequest.objects.filter(status='active').order_by('-created_at')
 
-    # Filtre par ville (si sélectionné dans le formulaire)
+    # Filtre ville
     city_id = request.GET.get('city')
     if city_id:
         requests = requests.filter(city_id=city_id)
 
     context = {
         'requests': requests,
-        'cities': City.objects.all(), # Pour le menu déroulant du filtre
+        'cities': City.objects.all(),
     }
     return render(request, 'marketplace/request_list.html', context)

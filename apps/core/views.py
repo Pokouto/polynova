@@ -8,6 +8,7 @@ from django.contrib.auth import get_user_model, authenticate, login, logout
 from apps.profiles.models import TutorProfile
 from apps.marketplace.models import CourseRequest
 from apps.core.models import Country, City
+from django.shortcuts import render
 
 User = get_user_model()
 
@@ -174,3 +175,19 @@ def delete_country(request, country_id):
     country.delete()
     messages.success(request, "Pays supprimé.")
     return redirect('admin_dashboard')
+
+
+def home(request):
+    return render(request, 'home.html')
+
+def about(request):
+    return render(request, 'pages/about.html')
+
+def contact(request):
+    return render(request, 'pages/contact.html')
+
+def faq(request):
+    return render(request, 'pages/faq.html')
+
+def pricing(request):
+    return render(request, 'pages/pricing.html')

@@ -1,11 +1,112 @@
 {% extends "base.html" %}
+
 {% block content %}
 <div class="bg-gray-50 min-h-screen py-12">
     <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-8"><h1 class="text-3xl font-bold text-gray-900">Déposer une annonce</h1></div>
+        
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Besoin d'un professeur ?</h1>
+            <p class="mt-2 text-gray-600">Remplissez ce formulaire Express en 2 minutes.</p>
+        </div>
+
         <div class="bg-white shadow-lg rounded-xl overflow-hidden border border-gray-100">
-            <div class="px-6 py-4 bg-blue-600 border-b border-blue-500"><h3 class="text-lg font-medium text-white flex items-center"><i class="fas fa-pencil-alt mr-2"></i> Nouvelle Demande</h3></div>
-            <div class="px-6 py-8 sm:p-10"><form method="POST" class="space-y-8">{% csrf_token %}{% if form.errors %}<div class="bg-red-50 p-4 rounded-md border-l-4 border-red-500 mb-6">Des erreurs sont présentes.</div>{% endif %}<div><h4 class="text-blue-600 font-bold text-sm uppercase tracking-wide border-b border-gray-200 pb-2 mb-4">1. Pour qui et quoi ?</h4><div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div><label class="block text-sm font-medium text-gray-700 mb-1">Niveau</label>{{ form.level }}</div><div><label class="block text-sm font-medium text-gray-700 mb-1">Matières</label>{{ form.subjects }}</div></div></div><div><h4 class="text-blue-600 font-bold text-sm uppercase tracking-wide border-b border-gray-200 pb-2 mb-4">2. Où ça se passe ?</h4><div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div><label class="block text-sm font-medium text-gray-700 mb-1">Ville</label>{{ form.city }}</div><div><label class="block text-sm font-medium text-gray-700 mb-1">Quartier</label>{{ form.quartier }}</div></div></div><div><h4 class="text-blue-600 font-bold text-sm uppercase tracking-wide border-b border-gray-200 pb-2 mb-4">3. Modalités</h4><div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div><label class="block text-sm font-medium text-gray-700 mb-1">Fréquence</label>{{ form.frequency }}</div><div><label class="block text-sm font-medium text-gray-700 mb-1">Budget</label>{{ form.budget_range }}</div></div><div class="mt-4 bg-blue-50 p-3 rounded-md flex items-start">{{ form.is_online }} <div class="ml-3 text-sm"><label class="font-medium text-blue-900">Accepter les cours en ligne</label></div></div></div><div><label class="block text-sm font-medium text-gray-700 mb-1">Détails</label>{{ form.description }}</div><div class="pt-6 flex items-center justify-end space-x-4 border-t border-gray-100"><a href="{% url 'dashboard' %}" class="text-gray-600 hover:text-gray-900 font-medium text-sm px-4 py-2">Annuler</a><button type="submit" class="inline-flex justify-center items-center py-3 px-6 border border-transparent shadow-md text-sm font-bold rounded-full text-white bg-orange-500 hover:bg-orange-600">Publier</button></div></form></div>
+            <div class="px-6 py-4 bg-blue-600 border-b border-blue-500 flex justify-between items-center">
+                <h3 class="text-lg font-medium text-white"><i class="fas fa-pencil-alt mr-2"></i> Formulaire Express</h3>
+                <span class="bg-blue-500 text-white text-xs px-2 py-1 rounded">Étape 1/2</span>
+            </div>
+            
+            <div class="px-6 py-8 sm:p-10">
+                <form method="POST" class="space-y-8">
+                    {% csrf_token %}
+                    
+                    {% if form.errors %}
+                        <div class="bg-red-50 p-4 rounded border-l-4 border-red-500 text-red-700 mb-4">
+                            Veuillez vérifier les champs surlignés.
+                        </div>
+                    {% endif %}
+
+                    <div>
+                        <h4 class="text-blue-600 font-bold text-sm uppercase border-b pb-2 mb-4">1. Votre Besoin</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div><label class="block text-sm font-medium mb-1">Niveau</label>{{ form.level }}</div>
+                            <div><label class="block text-sm font-medium mb-1">Matières</label>{{ form.subjects }}</div>
+                        </div>
+                        <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div><label class="block text-sm font-medium mb-1">Délai de démarrage</label>{{ form.start_time }}</div>
+                            <div><label class="block text-sm font-medium mb-1">Fréquence</label>{{ form.frequency }}</div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 class="text-blue-600 font-bold text-sm uppercase border-b pb-2 mb-4">2. Localisation</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div><label class="block text-sm font-medium mb-1">Ville</label>{{ form.city }}</div>
+                            <div><label class="block text-sm font-medium mb-1">Quartier</label>{{ form.quartier }}</div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 class="text-blue-600 font-bold text-sm uppercase border-b pb-2 mb-4">3. Critères Clés</h4>
+                        
+                        <div class="mb-4">
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Budget Mensuel Envisagé</label>
+                            {{ form.budget_range }}
+                            <p class="text-xs text-gray-500 mt-1">Important pour trouver le bon profil.</p>
+                        </div>
+
+                        <div class="bg-orange-50 p-4 rounded-lg border border-orange-100 mb-4">
+                            <label class="block text-sm font-bold text-gray-800 mb-2">Quelle est votre intention actuelle ?</label>
+                            <div class="space-y-2">
+                                {% for radio in form.intention %}
+                                    <div class="flex items-center">
+                                        {{ radio.tag }}
+                                        <label for="{{ radio.id_for_label }}" class="ml-2 text-sm text-gray-700 cursor-pointer">{{ radio.choice_label }}</label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center gap-2 bg-gray-50 p-3 rounded border border-gray-200">
+                            {{ form.is_online }} <label class="text-sm font-medium">J'accepte les cours en ligne (Visio)</label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 class="text-blue-600 font-bold text-sm uppercase border-b pb-2 mb-4">4. Vos Coordonnées</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50 p-4 rounded text-gray-500 text-sm">
+                            <div>
+                                <span class="block text-xs uppercase text-gray-400">Nom & Prénom</span>
+                                <strong>{{ user.first_name }} {{ user.last_name }}</strong>
+                            </div>
+                            <div>
+                                <span class="block text-xs uppercase text-gray-400">Email</span>
+                                {{ user.email }}
+                            </div>
+                            <div>
+                                <span class="block text-xs uppercase text-gray-400">Téléphone</span>
+                                {{ user.phone }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-2 pt-4">
+                        {{ form.terms_accepted }}
+                        <label class="text-sm text-gray-600 leading-tight">
+                            J’accepte d’être contacté(e) par des enseignants vérifiés via la plateforme.
+                        </label>
+                    </div>
+                    {% if form.terms_accepted.errors %}
+                        <p class="text-xs text-red-500">{{ form.terms_accepted.errors.0 }}</p>
+                    {% endif %}
+
+                    <div class="pt-6 flex justify-end gap-4 border-t border-gray-100">
+                        <a href="{% url 'dashboard' %}" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded">Annuler</a>
+                        <button type="submit" class="px-8 py-3 bg-green-600 text-white font-bold rounded-full shadow-md hover:bg-green-700 transition transform hover:-translate-y-0.5">
+                            Continuer
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>

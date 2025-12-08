@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="bg-gray-50 py-12">
+    <div class="container max-w-4xl mx-auto px-4">
+        <div class="text-center mb-12">
+            <h1 class="text-3xl font-bold text-gray-900">Foire Aux Questions</h1>
+            <p class="text-gray-600 mt-2">Les réponses à vos questions les plus fréquentes.</p>
+        </div>
+
+        <div class="space-y-8">
+            
+            <div>
+                <h2 class="text-xl font-bold text-blue-800 mb-4 border-b pb-2 border-gray-200"> <i class="fas fa-user-friends mr-2"></i> Pour les Parents</h2>
+                <div class="space-y-4">
+                    <details class="bg-white p-4 rounded-lg shadow-sm cursor-pointer border border-gray-100">
+                        <summary class="font-semibold text-gray-800">Comment trouver un professeur ?</summary>
+                        <p class="mt-2 text-gray-600 text-sm pl-4">Vous pouvez soit consulter l'annuaire et filtrer par matière/ville, soit déposer une demande précise pour recevoir des propositions.</p>
+                    </details>
+                    <details class="bg-white p-4 rounded-lg shadow-sm cursor-pointer border border-gray-100">
+                        <summary class="font-semibold text-gray-800">Est-ce que le service est payant ?</summary>
+                        <p class="mt-2 text-gray-600 text-sm pl-4">L'inscription et la recherche sont gratuites. Vous payez uniquement une somme modique (à partir de 1500 FCFA) pour obtenir le numéro de téléphone d'un professeur qui vous intéresse.</p>
+                    </details>
+                    <details class="bg-white p-4 rounded-lg shadow-sm cursor-pointer border border-gray-100">
+                        <summary class="font-semibold text-gray-800">Les professeurs sont-ils vérifiés ?</summary>
+                        <p class="mt-2 text-gray-600 text-sm pl-4">Oui, nous vérifions systématiquement la Carte Nationale d'Identité, le Casier Judiciaire et les Diplômes de chaque enseignant avant validation.</p>
+                    </details>
+                </div>
+            </div>
+
+            <div>
+                <h2 class="text-xl font-bold text-green-700 mb-4 border-b pb-2 border-gray-200 mt-8"> <i class="fas fa-chalkboard-teacher mr-2"></i> Pour les Enseignants</h2>
+                <div class="space-y-4">
+                    <details class="bg-white p-4 rounded-lg shadow-sm cursor-pointer border border-gray-100">
+                        <summary class="font-semibold text-gray-800">Comment devenir enseignant sur PolyNova ?</summary>
+                        <p class="mt-2 text-gray-600 text-sm pl-4">Inscrivez-vous gratuitement, complétez votre profil et téléversez vos documents (CNI, Casier, Diplômes). Une fois validé par notre équipe, vous serez visible.</p>
+                    </details>
+                    <details class="bg-white p-4 rounded-lg shadow-sm cursor-pointer border border-gray-100">
+                        <summary class="font-semibold text-gray-800">Combien coûte l'abonnement ?</summary>
+                        <p class="mt-2 text-gray-600 text-sm pl-4">L'abonnement est de 3 000 FCFA pour 30 jours. Il vous permet d'être visible dans l'annuaire et de répondre aux demandes des parents.</p>
+                    </details>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
