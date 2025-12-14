@@ -6,14 +6,16 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth import get_user_model, authenticate, login, logout
 from django.views.decorators.http import require_POST
 
+# Imports des modèles
 from apps.profiles.models import TutorProfile
 from apps.marketplace.models import CourseRequest
-from apps.core.models import Country, City
+from apps.core.models import Country
+from apps.actualites.models import Article, Category  # Gestion du Blog
 
 User = get_user_model()
 
 # ==============================================================================
-# 1. AUTHENTIFICATION ADMIN
+# 1. AUTHENTIFICATION
 # ==============================================================================
 
 def admin_login_view(request):
@@ -22,7 +24,7 @@ def admin_login_view(request):
         if request.user.is_staff:
             return redirect('admin_dashboard')
         else:
-            logout(request) # Déconnexion forcée si non-admin
+            logout(request)
 
     if request.method == 'POST':
         u = request.POST.get('username')
@@ -41,7 +43,7 @@ def admin_login_view(request):
     return render(request, 'custom_admin/login.html')
 
 def admin_logout(request):
-    """ Déconnexion et retour vers le login admin """
+    """ Déconnexion """
     logout(request)
     return redirect('admin_login')
 
@@ -53,196 +55,207 @@ def admin_logout(request):
 @login_required
 @user_passes_test(lambda u: u.is_staff, login_url='admin_login')
 def custom_admin_dashboard(request):
-    # Statistiques
+    # Statistiques globales
+    active_countries = Country.objects.all().order_by('name')
+    
     stats = {
         'parents_count': User.objects.filter(role='parent').count(),
         'tutors_validated': TutorProfile.objects.filter(status='validated').count(),
         'tutors_pending': TutorProfile.objects.filter(status='pending').count(),
         'active_requests': CourseRequest.objects.filter(status='active').count(),
+        'articles_count': Article.objects.count(),
     }
-
-    # Listes (avec select_related pour optimiser la base de données)
-    recent_parents = User.objects.filter(role='parent').order_by('-date_joined')[:50]
-    tutors_list = TutorProfile.objects.select_related('user').order_by('-created_at')[:50]
-    pending_tutors = TutorProfile.objects.filter(status='pending').select_related('user')
-    recent_requests = CourseRequest.objects.select_related('parent').order_by('-created_at')[:20]
-    
-    active_countries = Country.objects.all().order_by('name')
-    admin_users = User.objects.filter(is_staff=True).order_by('-is_superuser')
 
     context = {
         'stats': stats,
-        'recent_parents': recent_parents,
-        'tutors_list': tutors_list,
-        'pending_tutors': pending_tutors,
-        'recent_requests': recent_requests,
+        
+        # Listes séparées pour l'affichage
+        'recent_parents': User.objects.filter(role='parent').order_by('-date_joined')[:50],
+        'tutors_list': TutorProfile.objects.select_related('user').order_by('-created_at')[:50],
+        'pending_tutors': TutorProfile.objects.filter(status='pending').select_related('user'),
+        'recent_requests': CourseRequest.objects.select_related('parent').order_by('-created_at')[:20],
+        
+        # Gestion Pays
         'active_countries': active_countries,
-        'admin_users': admin_users,
+        
+        # Gestion Blog
+        'articles': Article.objects.select_related('category', 'author').order_by('-created_at'),
+        'categories': Category.objects.all(),
+        
+        # Gestion Admins
+        'admin_users': User.objects.filter(is_staff=True).order_by('-is_superuser'),
         'is_superuser': request.user.is_superuser,
     }
     return render(request, 'custom_admin/dashboard.html', context)
 
 
 # ==============================================================================
-# 3. GESTION UTILISATEURS (Admins, Parents, Profs)
+# 3. GESTION BLOG / ARTICLES
+# ==============================================================================
+
+@require_POST
+@user_passes_test(lambda u: u.is_staff)
+def create_article(request):
+    try:
+        cat_id = request.POST.get('category')
+        category = Category.objects.get(pk=cat_id) if cat_id else None
+        
+        Article.objects.create(
+            title=request.POST.get('title'),
+            category=category,
+            excerpt=request.POST.get('excerpt'),
+            content=request.POST.get('content'),
+            image=request.FILES.get('image'),
+            author=request.user,
+            is_published=True
+        )
+        messages.success(request, "Article publié avec succès.")
+    except Exception as e:
+        messages.error(request, f"Erreur : {str(e)}")
+    return redirect('admin_dashboard')
+
+@require_POST
+@user_passes_test(lambda u: u.is_staff)
+def edit_article(request, article_id):
+    """ Modification d'un article sans passer par l'admin Django """
+    article = get_object_or_404(Article, pk=article_id)
+    try:
+        article.title = request.POST.get('title')
+        
+        cat_id = request.POST.get('category')
+        if cat_id:
+            article.category = Category.objects.get(pk=cat_id)
+            
+        article.excerpt = request.POST.get('excerpt')
+        article.content = request.POST.get('content')
+        
+        if request.FILES.get('image'):
+            article.image = request.FILES.get('image')
+            
+        article.save()
+        messages.success(request, "Article modifié avec succès.")
+    except Exception as e:
+        messages.error(request, f"Erreur modification : {str(e)}")
+        
+    return redirect('admin_dashboard')
+
+@user_passes_test(lambda u: u.is_staff)
+def toggle_article_publish(request, article_id):
+    art = get_object_or_404(Article, pk=article_id)
+    art.is_published = not art.is_published
+    art.save()
+    status = "en ligne" if art.is_published else "brouillon"
+    messages.success(request, f"Article {status}.")
+    return redirect('admin_dashboard')
+
+@user_passes_test(lambda u: u.is_superuser)
+def delete_article(request, article_id):
+    get_object_or_404(Article, pk=article_id).delete()
+    messages.success(request, "Article supprimé.")
+    return redirect('admin_dashboard')
+
+
+# ==============================================================================
+# 4. GESTION UTILISATEURS (Parents, Profs, Admins)
 # ==============================================================================
 
 @user_passes_test(lambda u: u.is_superuser)
 def create_sub_admin(request):
-    """ Créer un sous-administrateur avec des permissions spécifiques """
     if request.method == 'POST':
         email = request.POST.get('email')
-        password = request.POST.get('password')
-        first_name = request.POST.get('first_name')
-        last_name = request.POST.get('last_name')
-        
-        can_validate = request.POST.get('perm_validation') == 'on'
-        can_manage_users = request.POST.get('perm_users') == 'on'
-
-        if User.objects.filter(email=email).exists():
-            messages.error(request, "Cet email existe déjà.")
-            return redirect('admin_dashboard')
-
-        user = User.objects.create_user(username=email, email=email, password=password)
-        user.first_name = first_name
-        user.last_name = last_name
-        user.role = 'admin'
-        user.is_staff = True
-        user.is_superuser = False
-        user.save()
-
-        # Attribution des permissions Django
-        if can_validate:
-            ct = ContentType.objects.get_for_model(TutorProfile)
-            perm = Permission.objects.get(codename='change_tutorprofile', content_type=ct)
-            user.user_permissions.add(perm)
-        
-        if can_manage_users:
-            ct = ContentType.objects.get_for_model(User)
-            perms = Permission.objects.filter(content_type=ct, codename__in=['change_customuser', 'delete_customuser'])
-            for p in perms: user.user_permissions.add(p)
-
-        messages.success(request, "Sous-admin créé avec succès !")
-    return redirect('admin_dashboard')
-
-@user_passes_test(lambda u: u.is_superuser)
-def delete_user(request, user_id):
-    """ Supprime n'importe quel utilisateur (C'est cette fonction qui manquait !) """
-    u = get_object_or_404(User, pk=user_id)
-    
-    if u.is_superuser:
-        messages.error(request, "Impossible de supprimer un Super Administrateur.")
-    elif u == request.user:
-        messages.error(request, "Vous ne pouvez pas vous supprimer vous-même.")
-    else:
-        u.delete()
-        messages.success(request, "Utilisateur supprimé définitivement.")
-        
+        if not User.objects.filter(email=email).exists():
+            u = User.objects.create_user(username=email, email=email, password=request.POST.get('password'))
+            u.first_name = request.POST.get('first_name')
+            u.last_name = request.POST.get('last_name')
+            u.role = 'admin'
+            u.is_staff = True
+            u.save()
+            messages.success(request, "Admin créé.")
     return redirect('admin_dashboard')
 
 @require_POST
 @user_passes_test(lambda u: u.is_staff)
 def update_user_status(request, user_id):
-    """ Bloquer / Débloquer ou Supprimer via formulaire """
     u = get_object_or_404(User, pk=user_id)
     action = request.POST.get('action')
-    
-    if action == 'delete':
-        if u.is_superuser or u == request.user:
-            messages.error(request, "Action impossible sur cet utilisateur.")
-        else:
-            u.delete()
-            messages.success(request, "Utilisateur supprimé.")
+    if action == 'delete' and not u.is_superuser:
+        u.delete()
+        messages.success(request, "Utilisateur supprimé.")
     elif action == 'toggle_active':
         u.is_active = not u.is_active
         u.save()
-        status = "activé" if u.is_active else "désactivé"
-        messages.success(request, f"Compte de {u.username} {status}.")
-        
+        messages.success(request, "Statut mis à jour.")
+    return redirect('admin_dashboard')
+
+@user_passes_test(lambda u: u.is_superuser)
+def delete_user(request, user_id):
+    u = get_object_or_404(User, pk=user_id)
+    if not u.is_superuser: u.delete()
+    messages.success(request, "Utilisateur supprimé.")
     return redirect('admin_dashboard')
 
 
 # ==============================================================================
-# 4. GESTION PAYS & CONFIGURATION
+# 5. GESTION PAYS
 # ==============================================================================
 
 @require_POST
 @user_passes_test(lambda u: u.is_staff)
 def add_country(request):
-    if request.method == 'POST':
-        name = request.POST.get('name')
-        code = request.POST.get('code')
-        currency = request.POST.get('currency')
-        
-        if Country.objects.filter(code=code).exists():
-            messages.error(request, "Ce code pays existe déjà.")
-        else:
-            Country.objects.create(name=name, code=code.upper(), currency_symbol=currency, is_active=True)
-            messages.success(request, f"Pays {name} ajouté !")
-            
+    Country.objects.create(
+        name=request.POST.get('name'), code=request.POST.get('code'),
+        currency_symbol=request.POST.get('currency'), is_active=True
+    )
+    messages.success(request, "Pays ajouté.")
     return redirect('admin_dashboard')
 
 @require_POST
 @user_passes_test(lambda u: u.is_staff)
 def update_country_config(request, country_id):
-    country = get_object_or_404(Country, pk=country_id)
-    try:
-        country.subscription_price = int(request.POST.get('subscription_price'))
-        country.min_budget_threshold = int(request.POST.get('min_budget_threshold'))
-        country.contact_prices = request.POST.get('contact_prices')
-        country.casier_delay_weeks = int(request.POST.get('casier_delay_weeks'))
-        country.save()
-        messages.success(request, f"Config {country.name} mise à jour.")
-    except ValueError:
-        messages.error(request, "Erreur de format dans les chiffres.")
+    c = get_object_or_404(Country, pk=country_id)
+    c.subscription_price = int(request.POST.get('subscription_price'))
+    c.min_budget_threshold = int(request.POST.get('min_budget_threshold'))
+    c.contact_prices = request.POST.get('contact_prices')
+    c.casier_delay_weeks = int(request.POST.get('casier_delay_weeks'))
+    c.save()
+    messages.success(request, "Configuration mise à jour.")
     return redirect('admin_dashboard')
 
 @user_passes_test(lambda u: u.is_staff)
 def toggle_country(request, country_id):
-    country = get_object_or_404(Country, pk=country_id)
-    country.is_active = not country.is_active
-    country.save()
-    status = "activé" if country.is_active else "désactivé"
-    messages.success(request, f"Pays {country.name} {status}.")
+    c = get_object_or_404(Country, pk=country_id)
+    c.is_active = not c.is_active
+    c.save()
+    messages.success(request, "Statut Pays changé.")
     return redirect('admin_dashboard')
 
 @user_passes_test(lambda u: u.is_superuser)
 def delete_country(request, country_id):
-    country = get_object_or_404(Country, pk=country_id)
-    country.delete()
+    get_object_or_404(Country, pk=country_id).delete()
     messages.success(request, "Pays supprimé.")
     return redirect('admin_dashboard')
 
 
 # ==============================================================================
-# 5. VALIDATION PROFESSEURS
+# 6. GESTION METIER (Profs, Demandes)
 # ==============================================================================
 
 @require_POST
 @user_passes_test(lambda u: u.is_staff)
 def validate_tutor(request, profile_id):
-    profile = get_object_or_404(TutorProfile, pk=profile_id)
-    action = request.POST.get('action')
-    
-    if action == 'validate':
-        profile.status = 'validated'
-        messages.success(request, f"Professeur {profile.user.username} validé.")
-    elif action == 'reject':
-        profile.status = 'rejected'
-        profile.admin_notes = request.POST.get('admin_notes', '')
-        messages.warning(request, f"Professeur {profile.user.username} rejeté.")
-    
-    profile.save()
+    p = get_object_or_404(TutorProfile, pk=profile_id)
+    if request.POST.get('action') == 'validate':
+        p.status = 'validated'
+        messages.success(request, "Professeur validé.")
+    else:
+        p.status = 'rejected'
+        p.admin_notes = request.POST.get('admin_notes', '')
+        messages.warning(request, "Professeur rejeté.")
+    p.save()
     return redirect('admin_dashboard')
-
-
-# ==============================================================================
-# 6. GESTION DEMANDES
-# ==============================================================================
 
 @user_passes_test(lambda u: u.is_superuser)
 def delete_request(request, request_id):
-    req = get_object_or_404(CourseRequest, pk=request_id)
-    req.delete()
-    messages.success(request, "Demande supprimée avec succès.")
+    get_object_or_404(CourseRequest, pk=request_id).delete()
+    messages.success(request, "Demande supprimée.")
     return redirect('admin_dashboard')

@@ -6,100 +6,99 @@
     <title>Administration - PolyNova</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* --- VARIABLES & LAYOUT (VOTRE DESIGN VALIDÉ) --- */
         :root {
-            --primary: #2c3e50; --secondary: #3498db; --success: #2ecc71;
-            --danger: #e74c3c; --warning: #f1c40f; --light: #ecf0f1;
-            --dark-bg: #1a252f;
+            --primary: #0f172a;    /* Bleu très sombre */
+            --secondary: #3b82f6;  /* Bleu vif */
+            --success: #10b981;    /* Vert */
+            --warning: #f59e0b;    /* Orange */
+            --danger: #ef4444;     /* Rouge */
+            --info: #0ea5e9;       /* Bleu clair */
+            --light: #f1f5f9;      /* Fond gris clair */
+            --white: #ffffff;
+            --text: #334155;
+            --border: #e2e8f0;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f6f9; display: flex; height: 100vh; overflow: hidden; }
-        
-        /* SIDEBAR */
-        .sidebar { width: 260px; background: var(--primary); color: white; display: flex; flex-direction: column; flex-shrink: 0; height: 100vh; overflow-y: auto; transition: 0.3s; }
-        .logo { padding: 20px; font-size: 1.4rem; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 10px; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--light); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
+
+        /* --- SIDEBAR --- */
+        .sidebar { width: 260px; background: var(--primary); color: white; display: flex; flex-direction: column; flex-shrink: 0; height: 100vh; overflow-y: auto; }
+        .logo { padding: 20px; font-size: 1.4rem; font-weight: 800; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 10px; letter-spacing: -0.5px; }
         .logo span { color: var(--secondary); }
-        .admin-info { padding: 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.1); }
+        .admin-profile { padding: 20px; text-align: center; background: rgba(255,255,255,0.03); border-bottom: 1px solid rgba(255,255,255,0.1); }
         .admin-avatar { width: 50px; height: 50px; background: var(--secondary); border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; color: white; }
         .admin-name { font-weight: 600; font-size: 0.95rem; }
         .admin-role { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
 
-        .menu { padding: 10px 0; flex: 1; }
-        .menu-label { padding: 10px 20px; font-size: 0.7rem; text-transform: uppercase; color: #95a5a6; font-weight: bold; margin-top: 15px; letter-spacing: 1px; }
-        .menu a { padding: 12px 20px; color: #bdc3c7; text-decoration: none; display: flex; align-items: center; gap: 12px; border-left: 3px solid transparent; transition: 0.2s; cursor: pointer; font-size: 0.9rem; }
-        .menu a:hover, .menu a.active { background: rgba(0,0,0,0.2); color: white; border-left-color: var(--secondary); }
-        .menu a i { width: 20px; text-align: center; }
-        
-        /* MAIN CONTENT */
-        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
-        .top-header { background: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e0e0e0; height: 70px; }
-        .page-title { font-size: 1.2rem; font-weight: 600; color: var(--primary); }
-        
-        .content { flex: 1; overflow-y: auto; padding: 30px; }
+        .menu { padding: 20px 0; flex: 1; }
+        .menu-category { padding: 15px 25px 5px; font-size: 0.7rem; text-transform: uppercase; color: #64748b; font-weight: 800; letter-spacing: 1px; }
+        .menu-link { display: flex; align-items: center; padding: 12px 25px; color: #cbd5e1; text-decoration: none; transition: 0.2s; border-left: 3px solid transparent; cursor: pointer; font-size: 0.9rem; }
+        .menu-link:hover, .menu-link.active { background: rgba(255,255,255,0.05); color: white; border-left-color: var(--secondary); }
+        .menu-link i { width: 24px; margin-right: 10px; text-align: center; font-size: 1rem; }
 
-        /* CARDS */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .stat-card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-left: 5px solid var(--primary); display: flex; justify-content: space-between; align-items: center; }
-        .stat-card.success { border-left-color: var(--success); } .stat-card.warning { border-left-color: var(--warning); }
-        .stat-val { font-size: 2rem; font-weight: bold; color: var(--primary); }
-        .stat-label { color: #7f8c8d; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; }
-        .stat-icon { font-size: 2.5rem; opacity: 0.15; }
+        /* --- MAIN CONTENT --- */
+        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+        .topbar { background: var(--white); height: 64px; padding: 0 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+        .page-title { font-size: 1.2rem; font-weight: 700; color: var(--primary); }
+        .content-scroll { flex: 1; overflow-y: auto; padding: 30px; }
+
+        /* --- UI ELEMENTS --- */
+        .card { background: var(--white); border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid var(--border); overflow: hidden; margin-bottom: 25px; }
+        .card-header { padding: 20px 25px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: #f8fafc; }
+        .card-title { font-size: 1rem; font-weight: 700; color: var(--primary); margin: 0; }
         
-        /* PANELS & TABLES */
-        .section { display: none; animation: fadeIn 0.3s; } .section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .panel { background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 30px; overflow: hidden; }
-        .panel-head { padding: 15px 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; background: #fafafa; }
-        .panel-head h3 { font-size: 1rem; margin: 0; color: var(--primary); font-weight: 700; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-box { background: var(--white); padding: 20px; border-radius: 12px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+        .stat-val { font-size: 1.8rem; font-weight: 800; color: var(--primary); line-height: 1; }
+        .stat-label { color: #64748b; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin-top: 5px; }
+        .stat-icon { width: 45px; height: 45px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; }
         
         .table-responsive { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-        th { text-align: left; padding: 15px 20px; background: #f8f9fa; color: #7f8c8d; text-transform: uppercase; font-size: 0.75rem; font-weight: 700; }
-        td { padding: 15px 20px; border-bottom: 1px solid #eee; color: #2c3e50; vertical-align: middle; }
-        tr:last-child td { border-bottom: none; }
+        th { text-align: left; padding: 15px 25px; background: #f8fafc; color: #64748b; text-transform: uppercase; font-size: 0.75rem; font-weight: 700; border-bottom: 1px solid var(--border); }
+        td { padding: 15px 25px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; }
         tr:hover { background-color: #fcfcfc; }
 
-        /* ELEMENTS UI */
         .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; display: inline-block; }
-        .bg-green { background: #d4edda; color: #155724; } 
-        .bg-red { background: #f8d7da; color: #721c24; } 
-        .bg-yellow { background: #fff3cd; color: #856404; }
-        .bg-blue { background: #d1ecf1; color: #0c5460; }
+        .bg-green { background: #dcfce7; color: #166534; } .bg-red { background: #fee2e2; color: #991b1b; } 
+        .bg-yellow { background: #fef3c7; color: #92400e; } .bg-blue { background: #e0f2fe; color: #075985; }
 
-        .clickable-name { color: var(--secondary); font-weight: 600; cursor: pointer; }
-        .clickable-name:hover { text-decoration: underline; }
+        .btn { padding: 8px 16px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; border: none; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+        .btn-sm { padding: 5px 10px; font-size: 0.75rem; }
+        .btn-primary { background: var(--secondary); color: white; } .btn-primary:hover { background: #2563eb; }
+        .btn-danger { background: var(--danger); color: white; } .btn-info { background: var(--info); color: white; }
+        .btn-outline { border: 1px solid #cbd5e1; background: white; color: #475569; } .btn-outline:hover { background: #f1f5f9; }
 
-        .btn { padding: 6px 12px; border-radius: 4px; border: none; cursor: pointer; font-size: 0.85rem; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; transition: 0.2s; }
-        .btn-primary { background: var(--secondary); color: white; } .btn-primary:hover { background: #2980b9; }
-        .btn-danger { background: var(--danger); color: white; } .btn-danger:hover { opacity: 0.9; }
-        .btn-info { background: var(--info); color: white; }
-        .btn-outline { border: 1px solid #bdc3c7; color: #7f8c8d; background: transparent; } .btn-outline:hover { background: #ecf0f1; }
-        .btn-sm { padding: 4px 8px; font-size: 0.75rem; }
-        
         /* MODALES */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
-        .modal.active { display: flex; }
-        .modal-box { background: white; width: 500px; max-width: 95%; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; transform: scale(0.95); animation: zoomIn 0.2s forwards; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+        .modal.active { display: flex; animation: fadeIn 0.2s; }
+        .modal-box { background: white; width: 600px; max-width: 95%; border-radius: 12px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); overflow: hidden; transform: scale(0.95); animation: zoomIn 0.2s forwards; }
+        .modal-box.lg { width: 800px; }
         @keyframes zoomIn { to { transform: scale(1); } }
         
-        .modal-head { padding: 15px 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; background: #f9f9f9; }
-        .modal-body { padding: 20px; max-height: 70vh; overflow-y: auto; }
-        .modal-foot { padding: 15px 20px; border-top: 1px solid #eee; text-align: right; background: #f9f9f9; display: flex; justify-content: flex-end; gap: 10px; }
+        .modal-head { padding: 20px 25px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: #f8fafc; }
+        .modal-head h3 { margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--primary); }
+        .modal-body { padding: 25px; max-height: 70vh; overflow-y: auto; }
+        .modal-foot { padding: 20px 25px; border-top: 1px solid var(--border); text-align: right; background: #f8fafc; display: flex; justify-content: flex-end; gap: 10px; }
 
-        /* FORMULAIRES */
+        /* Formulaires */
         .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.9rem; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.95rem; }
-        .form-readonly { background-color: #f0f2f5; color: #7f8c8d; cursor: not-allowed; }
+        .form-group label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.85rem; color: var(--text); }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.95rem; }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        
+        /* Sections */
+        .section { display: none; } .section.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* DETAILS UTILISATEUR */
-        .detail-row { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed #eee; padding-bottom: 5px; }
-        .detail-label { font-weight: bold; color: #7f8c8d; font-size: 0.9rem; }
-        .detail-value { font-weight: 600; color: #2c3e50; }
+        /* NOUVEAU : STYLE DETAIL PROF (SPACÉ) */
+        .info-grid { display: grid; grid-template-columns: 150px 1fr; gap: 15px; margin-bottom: 10px; border-bottom: 1px dashed var(--border); padding-bottom: 10px; align-items: baseline; }
+        .info-label { font-weight: 600; color: #64748b; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .info-value { font-weight: 700; color: var(--primary); font-size: 1rem; }
 
-        /* ALERTS */
-        .alert { padding: 12px 20px; margin-bottom: 20px; border-radius: 6px; color: white; display: flex; align-items: center; gap: 10px; font-weight: 500; }
+        .clickable-name { color: var(--secondary); font-weight: bold; cursor: pointer; }
+        .alert { padding: 15px; margin-bottom: 20px; border-radius: 8px; color: white; font-weight: 500; display: flex; align-items: center; gap: 10px; }
         .alert-success { background: var(--success); } .alert-error { background: var(--danger); }
     </style>
 </head>
@@ -107,91 +106,162 @@
 
     <div class="sidebar">
         <div class="logo"><i class="fas fa-graduation-cap"></i> Poly<span>Nova</span></div>
-        <div class="admin-info">
+        <div class="admin-profile">
             <div class="admin-avatar">{{ user.username|slice:":1"|upper }}</div>
             <div class="admin-name">{{ user.first_name }} {{ user.last_name }}</div>
             <div class="admin-role">{% if user.is_superuser %}Super Admin{% else %}Modérateur{% endif %}</div>
         </div>
+        
         <div class="menu">
-            <div class="menu-label">Principal</div>
-            <a href="#" class="active" data-target="dashboard"><i class="fas fa-chart-line"></i> Tableau de bord</a>
+            <div class="menu-category">Principal</div>
+            <div class="menu-link active" data-target="dashboard"><i class="fas fa-tachometer-alt"></i> Tableau de bord</div>
             
-            <div class="menu-label">Gestion</div>
-            <a href="#" data-target="validation"><i class="fas fa-user-check"></i> Validations {% if stats.tutors_pending > 0 %}<span class="badge bg-red" style="margin-left:auto;">{{ stats.tutors_pending }}</span>{% endif %}</a>
-            <a href="#" data-target="users"><i class="fas fa-users"></i> Utilisateurs</a>
-            <a href="#" data-target="geo"><i class="fas fa-globe"></i> Pays & Config</a>
+            <div class="menu-category">Contenu</div>
+            <div class="menu-link" data-target="blog"><i class="fas fa-newspaper"></i> Blog / Actus</div>
+
+            <div class="menu-category">Utilisateurs</div>
+            <div class="menu-link" data-target="teachers"><i class="fas fa-chalkboard-teacher"></i> Enseignants</div>
+            <div class="menu-link" data-target="parents"><i class="fas fa-user-friends"></i> Parents</div>
             
             {% if is_superuser %}
-            <a href="#" data-target="admins"><i class="fas fa-user-shield"></i> Administrateurs</a>
+            <div class="menu-link" data-target="admins"><i class="fas fa-user-shield"></i> Administrateurs</div>
             {% endif %}
 
-            <div class="menu-label">Activités</div>
-            <a href="#" data-target="requests"><i class="fas fa-list-ul"></i> Demandes de cours</a>
+            <div class="menu-category">Gestion</div>
+            <div class="menu-link" data-target="validation"><i class="fas fa-user-check"></i> Validations {% if stats.tutors_pending > 0 %}<span class="badge bg-red" style="margin-left:auto;">{{ stats.tutors_pending }}</span>{% endif %}</div>
+            <div class="menu-link" data-target="geo"><i class="fas fa-globe"></i> Pays & Config</div>
+            <div class="menu-link" data-target="requests"><i class="fas fa-list-ul"></i> Demandes de cours</div>
 
-            <div class="menu-label">Système</div>
-            <a href="{% url 'home' %}" target="_blank"><i class="fas fa-external-link-alt"></i> Voir le site</a>
-            <a href="{% url 'admin_logout' %}" style="color: #ff7675;"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+            <div class="menu-category">Système</div>
+            <a href="{% url 'home' %}" target="_blank" class="menu-link"><i class="fas fa-external-link-alt"></i> Voir le site</a>
+            <a href="{% url 'admin_logout' %}" class="menu-link" style="color:#fca5a5;"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
         </div>
     </div>
 
     <div class="main">
-        <div class="top-header">
+        <div class="topbar">
             <div class="page-title">Tableau de Bord</div>
-            <a href="{% url 'admin_logout' %}" class="btn btn-outline btn-sm"><i class="fas fa-power-off"></i> Déconnexion</a>
+            <div><a href="{% url 'admin_logout' %}" class="btn btn-outline btn-sm"><i class="fas fa-power-off"></i> Déconnexion</a></div>
         </div>
 
-        <div class="content">
+        <div class="content-scroll">
             {% if messages %}
                 {% for message in messages %}
                     <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-error{% endif %}">
-                        <i class="fas {% if message.tags == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %}"></i>
-                        {{ message }}
+                        <i class="fas {% if message.tags == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %}"></i> {{ message }}
                     </div>
                 {% endfor %}
             {% endif %}
 
             <div class="section active" id="dashboard">
                 <div class="stats-grid">
-                    <div class="stat-card"><div class="stat-info"><h3>{{ stats.parents_count }}</h3><p>Parents</p></div><i class="fas fa-users stat-icon" style="color:var(--primary)"></i></div>
-                    <div class="stat-card success"><div class="stat-info"><h3>{{ stats.tutors_validated }}</h3><p>Profs Validés</p></div><i class="fas fa-chalkboard-teacher stat-icon" style="color:var(--success)"></i></div>
-                    <div class="stat-card warning"><div class="stat-info"><h3>{{ stats.tutors_pending }}</h3><p>En Attente</p></div><i class="fas fa-clock stat-icon" style="color:var(--warning)"></i></div>
-                    <div class="stat-card"><div class="stat-info"><h3>{{ stats.active_requests }}</h3><p>Demandes</p></div><i class="fas fa-bullhorn stat-icon" style="color:var(--primary)"></i></div>
+                    <div class="stat-box">
+                        <div><div class="stat-val">{{ stats.parents_count }}</div><div class="stat-label">Parents</div></div>
+                        <div class="stat-icon bg-blue"><i class="fas fa-users text-blue-600"></i></div>
+                    </div>
+                    <div class="stat-box">
+                        <div><div class="stat-val">{{ stats.tutors_validated }}</div><div class="stat-label">Profs Validés</div></div>
+                        <div class="stat-icon bg-green"><i class="fas fa-chalkboard-teacher text-green-600"></i></div>
+                    </div>
+                    <div class="stat-box">
+                        <div><div class="stat-val">{{ active_countries.count }}</div><div class="stat-label">Pays Valides</div></div>
+                        <div class="stat-icon bg-blue"><i class="fas fa-globe text-blue-600"></i></div>
+                    </div>
+                    <div class="stat-box">
+                        <div><div class="stat-val">{{ stats.articles_count }}</div><div class="stat-label">Articles Blog</div></div>
+                        <div class="stat-icon bg-yellow"><i class="fas fa-newspaper text-yellow-600"></i></div>
+                    </div>
                 </div>
-                <div class="panel">
-                    <div class="panel-head"><h3>Accès Rapides</h3></div>
-                    <div style="padding:20px; display:flex; gap:10px;">
-                        <button onclick="document.querySelector('[data-target=geo]').click()" class="btn btn-outline">Gérer les Pays</button>
-                        <button onclick="document.querySelector('[data-target=validation]').click()" class="btn btn-outline">Validations</button>
+                
+                <div class="card">
+                    <div class="card-header"><h3>Actions Rapides</h3></div>
+                    <div style="padding:25px; display:flex; gap:15px; flex-wrap:wrap;">
+                        <button onclick="switchTab('blog'); openModal('createArticleModal')" class="btn btn-primary"><i class="fas fa-pen"></i> Rédiger Article</button>
+                        <button onclick="switchTab('geo'); openModal('addCountryModal')" class="btn btn-outline"><i class="fas fa-plus"></i> Ajouter Pays</button>
+                        <button onclick="switchTab('validation')" class="btn btn-outline"><i class="fas fa-user-check"></i> Valider Profs</button>
                         {% if is_superuser %}
-                        <button onclick="openModal('addAdminModal')" class="btn btn-primary">Ajouter Admin</button>
+                        <button onclick="openModal('addAdminModal')" class="btn btn-outline"><i class="fas fa-user-shield"></i> Nouvel Admin</button>
                         {% endif %}
                     </div>
                 </div>
             </div>
 
-            <div class="section" id="geo">
-                <div class="panel">
-                    <div class="panel-head">
-                        <h3>Pays Configurés</h3>
-                        <button class="btn btn-primary btn-sm" onclick="openModal('addCountryModal')"><i class="fas fa-plus"></i> Ajouter Pays</button>
+            <div class="section" id="blog">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Articles du Blog</h3>
+                        <button class="btn btn-primary btn-sm" onclick="openModal('createArticleModal')"><i class="fas fa-plus"></i> Nouvel Article</button>
                     </div>
                     <div class="table-responsive">
                         <table>
-                            <thead><tr><th>Pays</th><th>Code</th><th>Devise</th><th>Statut</th><th>Actions</th></tr></thead>
+                            <thead><tr><th>Titre</th><th>Catégorie</th><th>Date</th><th>Statut</th><th>Actions</th></tr></thead>
                             <tbody>
-                                {% for c in active_countries %}
+                                {% for art in articles %}
                                 <tr>
-                                    <td><strong>{{ c.name }}</strong></td>
-                                    <td>{{ c.code }}</td>
-                                    <td>{{ c.currency_symbol }}</td>
-                                    <td>{% if c.is_active %}<span class="badge bg-green">Activé</span>{% else %}<span class="badge bg-red">Désactivé</span>{% endif %}</td>
+                                    <td><strong>{{ art.title }}</strong></td>
+                                    <td>{% if art.category %}<span class="badge bg-blue">{{ art.category.name }}</span>{% else %}--{% endif %}</td>
+                                    <td>{{ art.created_at|date:"d/m/Y" }}</td>
+                                    <td>{% if art.is_published %}<span class="badge bg-green">En ligne</span>{% else %}<span class="badge bg-yellow">Brouillon</span>{% endif %}</td>
                                     <td>
-                                        <button onclick="openConfigModal('{{ c.id }}', '{{ c.name }}', '{{ c.subscription_price }}', '{{ c.contact_prices }}', '{{ c.min_budget_threshold }}', '{{ c.casier_delay_weeks }}')" class="btn btn-info btn-sm">Config</button>
-                                        <a href="{% url 'toggle_country' c.id %}" class="btn btn-outline btn-sm">{% if c.is_active %}Désactiver{% else %}Activer{% endif %}</a>
-                                        {% if is_superuser %}<a href="{% url 'delete_country' c.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer ?')"><i class="fas fa-trash"></i></a>{% endif %}
+                                        <a href="/blog/" target="_blank" class="btn btn-info btn-sm">Voir</a>
+                                        <button onclick="openEditArticleModal('{{ art.id }}', `{{ art.title }}`, '{{ art.category.id }}', `{{ art.excerpt }}`, `{{ art.content }}`)" class="btn btn-warning btn-sm">Modifier</button>
+                                        
+                                        <a href="{% url 'toggle_article_publish' art.id %}" class="btn btn-outline btn-sm">{% if art.is_published %}Dépublier{% else %}Publier{% endif %}</a>
+                                        {% if is_superuser %}
+                                        <a href="{% url 'delete_article' art.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer cet article ?')"><i class="fas fa-trash"></i></a>
+                                        {% endif %}
                                     </td>
                                 </tr>
-                                {% empty %}<tr><td colspan="6" style="text-align:center;">Aucun pays.</td></tr>{% endfor %}
+                                {% empty %}<tr><td colspan="5" style="text-align:center;">Aucun article.</td></tr>{% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section" id="teachers">
+                <div class="card">
+                    <div class="card-header"><h3 class="card-title">Enseignants</h3></div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead><tr><th>Nom</th><th>Email</th><th>Statut</th><th>Actions</th></tr></thead>
+                            <tbody>
+                                {% for t in tutors_list %}
+                                <tr>
+                                    <td><span class="clickable-name" onclick="showUserDetail('{{ t.user.first_name }} {{ t.user.last_name }}', '{{ t.user.email }}', '{{ t.user.phone }}', 'Enseignant', '{{ t.status }}', '{{ t.created_at|date:'d/m/Y' }}')">{{ t.user.first_name }} {{ t.user.last_name }}</span></td>
+                                    <td>{{ t.user.email }}</td>
+                                    <td><span class="badge {% if t.status == 'validated' %}bg-green{% elif t.status == 'pending' %}bg-yellow{% else %}bg-red{% endif %}">{{ t.status }}</span></td>
+                                    <td>
+                                        <form action="{% url 'update_user_status' t.user.id %}" method="POST" style="display:inline;">{% csrf_token %}<input type="hidden" name="action" value="toggle_active"><button class="btn btn-outline btn-sm">{% if t.user.is_active %}Bloquer{% else %}Activer{% endif %}</button></form>
+                                        {% if is_superuser %}<form action="{% url 'update_user_status' t.user.id %}" method="POST" style="display:inline;">{% csrf_token %}<input type="hidden" name="action" value="delete"><button class="btn btn-danger btn-sm">Supprimer</button></form>{% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section" id="parents">
+                <div class="card">
+                    <div class="card-header"><h3 class="card-title">Parents</h3></div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead><tr><th>Nom</th><th>Email</th><th>Téléphone</th><th>Statut</th><th>Actions</th></tr></thead>
+                            <tbody>
+                                {% for p in recent_parents %}
+                                <tr>
+                                    <td><span class="clickable-name" onclick="showUserDetail('{{ p.first_name }} {{ p.last_name }}', '{{ p.email }}', '{{ p.phone }}', 'Parent', 'Actif', '{{ p.date_joined|date:'d/m/Y' }}')">{{ p.first_name }} {{ p.last_name }}</span></td>
+                                    <td>{{ p.email }}</td>
+                                    <td>{{ p.phone }}</td>
+                                    <td><span class="badge bg-green">ACTIF</span></td>
+                                    <td>
+                                        <form action="{% url 'update_user_status' p.id %}" method="POST" style="display:inline;">{% csrf_token %}<input type="hidden" name="action" value="toggle_active"><button class="btn btn-outline btn-sm">{% if p.is_active %}Bloquer{% else %}Activer{% endif %}</button></form>
+                                        {% if is_superuser %}<form action="{% url 'update_user_status' p.id %}" method="POST" style="display:inline;">{% csrf_token %}<input type="hidden" name="action" value="delete"><button class="btn btn-danger btn-sm">Supprimer</button></form>{% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>
@@ -199,11 +269,11 @@
             </div>
 
             <div class="section" id="validation">
-                <div class="panel">
-                    <div class="panel-head"><h3>Enseignants en attente</h3></div>
+                <div class="card">
+                    <div class="card-header"><h3 class="card-title">Dossiers à traiter</h3></div>
                     <div class="table-responsive">
                         <table>
-                            <thead><tr><th>Enseignant</th><th>Email</th><th>Docs</th><th>Date</th><th>Action</th></tr></thead>
+                            <thead><tr><th>Nom</th><th>Email</th><th>Documents</th><th>Date</th><th>Action</th></tr></thead>
                             <tbody>
                                 {% for tutor in pending_tutors %}
                                 <tr>
@@ -215,44 +285,36 @@
                                     </td>
                                     <td>{{ tutor.created_at|date:"d/m/Y" }}</td>
                                     <td>
-                                        <button onclick="openValidationModal('{{ tutor.id }}', '{{ tutor.user.first_name }}', '{{ tutor.cni_document.url }}', '{{ tutor.casier_judiciaire.url }}')" class="btn btn-primary btn-sm">Inspecter</button>
+                                        <button onclick="openValidationModal('{{ tutor.id }}', '{{ tutor.user.first_name }} {{ tutor.user.last_name }}', '{{ tutor.user.email }}', '{{ tutor.cni_document.url }}', '{{ tutor.casier_judiciaire.url }}')" class="btn btn-info btn-sm">Inspecter</button>
                                     </td>
                                 </tr>
-                                {% empty %}<tr><td colspan="5" style="text-align:center;">Aucun dossier.</td></tr>{% endfor %}
+                                {% empty %}<tr><td colspan="5" style="text-align:center;">Aucun dossier en attente.</td></tr>{% endfor %}
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <div class="section" id="users">
-                <div class="panel">
-                    <div class="panel-head"><h3>Tous les Utilisateurs (Parents & Profs)</h3></div>
+            <div class="section" id="geo">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Pays Configurés</h3>
+                        <button class="btn btn-primary btn-sm" onclick="openModal('addCountryModal')"><i class="fas fa-plus"></i> Ajouter</button>
+                    </div>
                     <div class="table-responsive">
                         <table>
-                            <thead><tr><th>Type</th><th>Nom</th><th>Email</th><th>Statut</th><th>Actions</th></tr></thead>
+                            <thead><tr><th>Pays</th><th>Code</th><th>Devise</th><th>Statut</th><th>Actions</th></tr></thead>
                             <tbody>
-                                {% for t in tutors_list %}
+                                {% for c in active_countries %}
                                 <tr>
-                                    <td><span class="badge bg-blue">PROF</span></td>
-                                    <td><span class="clickable-name" onclick="showUserDetail('{{ t.user.first_name }} {{ t.user.last_name }}', '{{ t.user.email }}', '{{ t.user.phone }}', 'Enseignant', '{{ t.status }}', '{{ t.created_at|date:'d/m/Y' }}')">{{ t.user.first_name }} {{ t.user.last_name }}</span></td>
-                                    <td>{{ t.user.email }}</td>
-                                    <td><span class="badge {% if t.status == 'validated' %}bg-green{% else %}bg-yellow{% endif %}">{{ t.status }}</span></td>
+                                    <td><strong>{{ c.name }}</strong></td>
+                                    <td>{{ c.code }}</td>
+                                    <td>{{ c.currency_symbol }}</td>
+                                    <td>{% if c.is_active %}<span class="badge bg-green">Actif</span>{% else %}<span class="badge bg-red">Inactif</span>{% endif %}</td>
                                     <td>
-                                        <form action="{% url 'update_user_status' t.user.id %}" method="POST" style="display:inline;">{% csrf_token %}<input type="hidden" name="action" value="toggle_active"><button class="btn btn-outline btn-sm">{% if t.user.is_active %}Bloquer{% else %}Activer{% endif %}</button></form>
-                                        {% if is_superuser %}<form action="{% url 'update_user_status' t.user.id %}" method="POST" style="display:inline;">{% csrf_token %}<input type="hidden" name="action" value="delete"><button class="btn btn-danger btn-sm" onclick="return confirm('Supprimer ?')"><i class="fas fa-trash"></i></button></form>{% endif %}
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                                {% for p in recent_parents %}
-                                <tr>
-                                    <td><span class="badge bg-green">PARENT</span></td>
-                                    <td><span class="clickable-name" onclick="showUserDetail('{{ p.first_name }} {{ p.last_name }}', '{{ p.email }}', '{{ p.phone }}', 'Parent', 'Actif', '{{ p.date_joined|date:'d/m/Y' }}')">{{ p.first_name }} {{ p.last_name }}</span></td>
-                                    <td>{{ p.email }}</td>
-                                    <td><span class="badge bg-green">ACTIF</span></td>
-                                    <td>
-                                        <form action="{% url 'update_user_status' p.id %}" method="POST" style="display:inline;">{% csrf_token %}<input type="hidden" name="action" value="toggle_active"><button class="btn btn-outline btn-sm">{% if p.is_active %}Bloquer{% else %}Activer{% endif %}</button></form>
-                                        {% if is_superuser %}<form action="{% url 'update_user_status' p.id %}" method="POST" style="display:inline;">{% csrf_token %}<input type="hidden" name="action" value="delete"><button class="btn btn-danger btn-sm" onclick="return confirm('Supprimer ?')"><i class="fas fa-trash"></i></button></form>{% endif %}
+                                        <button onclick="openConfigModal('{{ c.id }}', '{{ c.name }}', '{{ c.subscription_price }}', '{{ c.contact_prices }}', '{{ c.min_budget_threshold }}', '{{ c.casier_delay_weeks }}')" class="btn btn-outline btn-sm">Configurer</button>
+                                        <a href="{% url 'toggle_country' c.id %}" class="btn btn-outline btn-sm">{% if c.is_active %}Désactiver{% else %}Activer{% endif %}</a>
+                                        {% if is_superuser %}<a href="{% url 'delete_country' c.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer ce pays ?')">Supprimer</a>{% endif %}
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -263,8 +325,8 @@
             </div>
 
             <div class="section" id="requests">
-                <div class="panel">
-                    <div class="panel-head"><h3>Demandes de cours</h3></div>
+                <div class="card">
+                    <div class="card-header"><h3 class="card-title">Demandes de cours</h3></div>
                     <div class="table-responsive">
                         <table>
                             <thead><tr><th>Date</th><th>Parent</th><th>Besoin</th><th>Budget</th><th>Statut</th><th>Action</th></tr></thead>
@@ -276,13 +338,9 @@
                                     <td>{{ r.level.name }} / {{ r.subjects.first.name }}</td>
                                     <td><strong>{{ r.get_budget_range_display }}</strong></td>
                                     <td><span class="badge bg-blue">{{ r.get_status_display }}</span></td>
-                                    <td>
-                                        {% if is_superuser %}
-                                            <a href="{% url 'delete_request' r.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer ?')"><i class="fas fa-trash"></i></a>
-                                        {% else %}<span style="color:#ccc;">--</span>{% endif %}
-                                    </td>
+                                    <td>{% if is_superuser %}<a href="{% url 'delete_request' r.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer ?')">Supprimer</a>{% else %}--{% endif %}</td>
                                 </tr>
-                                {% empty %}<tr><td colspan="6" style="text-align:center;">Aucune demande.</td></tr>{% endfor %}
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>
@@ -291,11 +349,8 @@
 
             {% if is_superuser %}
             <div class="section" id="admins">
-                <div class="panel">
-                    <div class="panel-head">
-                        <h3>Administrateurs</h3>
-                        <button class="btn btn-primary btn-sm" onclick="openModal('addAdminModal')"><i class="fas fa-plus"></i> Ajouter</button>
-                    </div>
+                <div class="card">
+                    <div class="card-header"><h3 class="card-title">Administrateurs</h3><button class="btn btn-primary btn-sm" onclick="openModal('addAdminModal')"><i class="fas fa-plus"></i> Ajouter</button></div>
                     <div class="table-responsive">
                         <table>
                             <thead><tr><th>Email</th><th>Rôle</th><th>Action</th></tr></thead>
@@ -304,11 +359,7 @@
                                 <tr>
                                     <td>{{ a.email }}</td>
                                     <td>{% if a.is_superuser %}<span class="badge bg-green">Super Admin</span>{% else %}<span class="badge bg-yellow">Sous-Admin</span>{% endif %}</td>
-                                    <td>
-                                        {% if not a.is_superuser %}
-                                            <a href="{% url 'delete_sub_admin' a.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer ?')"><i class="fas fa-trash"></i></a>
-                                        {% endif %}
-                                    </td>
+                                    <td>{% if not a.is_superuser %}<a href="{% url 'delete_sub_admin' a.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer ?')">Supprimer</a>{% endif %}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -320,46 +371,40 @@
         </div>
     </div>
 
-    <div class="modal" id="addCountryModal">
-        <div class="modal-box">
-            <form action="{% url 'add_country' %}" method="POST">
+    <div class="modal" id="createArticleModal">
+        <div class="modal-box lg">
+            <form action="{% url 'create_article' %}" method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
-                <div class="modal-head"><h3>Ajouter un Pays</h3><i class="fas fa-times cursor-pointer" onclick="closeModal('addCountryModal')"></i></div>
+                <div class="modal-head"><h3>Nouvel Article</h3><i class="fas fa-times cursor-pointer" onclick="closeModal('createArticleModal')"></i></div>
                 <div class="modal-body">
-                    <div class="form-group">
-                        <label>Sélectionner un pays</label>
-                        <select id="countrySelect" onchange="fillCountryInfo()">
-                            <option value="">-- Choisir un pays --</option>
-                            </select>
-                    </div>
-                    <input type="hidden" name="name" id="countryNameInput">
+                    <div class="form-group"><label>Titre</label><input type="text" name="title" required></div>
                     <div class="form-grid">
-                        <div class="form-group"><label>Code ISO</label><input type="text" name="code" id="countryCodeInput" readonly class="form-readonly"></div>
-                        <div class="form-group"><label>Devise</label><input type="text" name="currency" id="countryCurrencyInput" readonly class="form-readonly"></div>
+                        <div class="form-group"><label>Catégorie</label><select name="category"><option value="">-- Choisir --</option>{% for cat in categories %}<option value="{{ cat.id }}">{{ cat.name }}</option>{% endfor %}</select></div>
+                        <div class="form-group"><label>Image</label><input type="file" name="image"></div>
                     </div>
+                    <div class="form-group"><label>Extrait</label><textarea name="excerpt" rows="2" required></textarea></div>
+                    <div class="form-group"><label>Contenu</label><textarea name="content" rows="6" required></textarea></div>
                 </div>
-                <div class="modal-foot">
-                    <button type="button" class="btn btn-outline" onclick="closeModal('addCountryModal')">Annuler</button>
-                    <button type="submit" class="btn btn-primary">Ajouter</button>
-                </div>
+                <div class="modal-foot"><button type="submit" class="btn btn-primary">Publier</button></div>
             </form>
         </div>
     </div>
 
-    <div class="modal" id="configModal">
-        <div class="modal-box">
-            <form id="configForm" method="POST" action="">
+    <div class="modal" id="editArticleModal">
+        <div class="modal-box lg">
+            <form id="editArticleForm" method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
-                <div class="modal-head"><h3>Configuration : <span id="configCountryName"></span></h3><i class="fas fa-times cursor-pointer" onclick="closeModal('configModal')"></i></div>
+                <div class="modal-head"><h3>Modifier Article</h3><i class="fas fa-times cursor-pointer" onclick="closeModal('editArticleModal')"></i></div>
                 <div class="modal-body">
+                    <div class="form-group"><label>Titre</label><input type="text" name="title" id="editArtTitle" required></div>
                     <div class="form-grid">
-                        <div class="form-group"><label>Abonnement Prof</label><input type="number" name="subscription_price" id="confSubPrice"></div>
-                        <div class="form-group"><label>Seuil Budget</label><input type="number" name="min_budget_threshold" id="confThreshold"></div>
+                        <div class="form-group"><label>Catégorie</label><select name="category" id="editArtCat"><option value="">-- Choisir --</option>{% for cat in categories %}<option value="{{ cat.id }}">{{ cat.name }}</option>{% endfor %}</select></div>
+                        <div class="form-group"><label>Nouvelle Image (Optionnel)</label><input type="file" name="image"></div>
                     </div>
-                    <div class="form-group"><label>Prix Contacts (Liste)</label><input type="text" name="contact_prices" id="confContacts"></div>
-                    <div class="form-group"><label>Délai Casier (Semaines)</label><input type="number" name="casier_delay_weeks" id="confDelay"></div>
+                    <div class="form-group"><label>Extrait</label><textarea name="excerpt" id="editArtExcerpt" rows="2" required></textarea></div>
+                    <div class="form-group"><label>Contenu</label><textarea name="content" id="editArtContent" rows="6" required></textarea></div>
                 </div>
-                <div class="modal-foot"><button type="submit" class="btn btn-primary">Sauvegarder</button></div>
+                <div class="modal-foot"><button type="submit" class="btn btn-warning">Mettre à jour</button></div>
             </form>
         </div>
     </div>
@@ -368,37 +413,57 @@
         <div class="modal-box">
             <form id="validationForm" method="POST" action="">
                 {% csrf_token %}
-                <div class="modal-head"><h3>Validation : <span id="valTutorName"></span></h3><i class="fas fa-times cursor-pointer" onclick="closeModal('validationModal')"></i></div>
+                <div class="modal-head"><h3>Inspection du Dossier</h3><i class="fas fa-times cursor-pointer" onclick="closeModal('validationModal')"></i></div>
                 <div class="modal-body">
-                    <div style="display:flex; gap:15px; margin-bottom:20px; background:#f8f9fa; padding:15px; border-radius:6px;">
-                        <a href="#" id="linkCNI" target="_blank" class="btn btn-outline btn-sm"><i class="fas fa-id-card"></i> Voir CNI</a>
-                        <a href="#" id="linkCasier" target="_blank" class="btn btn-outline btn-sm"><i class="fas fa-file-contract"></i> Voir Casier</a>
+                    <div class="info-grid"><span class="info-label">Nom complet</span><span class="info-value" id="valName"></span></div>
+                    <div class="info-grid"><span class="info-label">Email</span><span class="info-value" id="valEmail"></span></div>
+                    
+                    <div style="display:flex; gap:15px; margin:20px 0;">
+                        <a href="#" id="linkCNI" target="_blank" class="btn btn-outline" style="flex:1; text-align:center;"><i class="fas fa-id-card"></i> Voir CNI</a>
+                        <a href="#" id="linkCasier" target="_blank" class="btn btn-outline" style="flex:1; text-align:center;"><i class="fas fa-file-contract"></i> Voir Casier</a>
                     </div>
-                    <div class="form-group"><label>Note Admin / Motif Rejet</label><textarea name="admin_notes" rows="3" style="width:100%; padding:10px; border:1px solid #ddd;"></textarea></div>
+                    
+                    <div class="form-group">
+                        <label>Note Admin / Motif Rejet</label>
+                        <textarea name="admin_notes" rows="3" placeholder="Écrire ici si rejeté..."></textarea>
+                    </div>
                 </div>
                 <div class="modal-foot" style="justify-content:space-between;">
                     <button type="submit" name="action" value="reject" class="btn btn-danger">Rejeter</button>
-                    <button type="submit" name="action" value="validate" class="btn btn-primary">Valider</button>
+                    <button type="submit" name="action" value="validate" class="btn btn-success">Valider</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div class="modal" id="viewUserModal">
+    <div class="modal" id="addCountryModal">
         <div class="modal-box">
-            <div class="modal-head"><h3>Détails Utilisateur</h3><i class="fas fa-times cursor-pointer" onclick="closeModal('viewUserModal')"></i></div>
-            <div class="modal-body">
-                <div style="text-align:center; margin-bottom:20px;">
-                    <div style="width:70px; height:70px; background:var(--secondary); color:white; font-size:2rem; font-weight:bold; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto;" id="detailAvatar"></div>
-                    <h2 id="detailName" style="margin-top:10px;"></h2>
+            <form action="{% url 'add_country' %}" method="POST">
+                {% csrf_token %}
+                <div class="modal-head"><h3>Ajouter Pays</h3><i class="fas fa-times cursor-pointer" onclick="closeModal('addCountryModal')"></i></div>
+                <div class="modal-body">
+                    <div class="form-group"><label>Sélectionner Pays</label><select id="countrySelect" onchange="fillCountryInfo()"><option value="">-- Choisir --</option></select></div>
+                    <input type="hidden" name="name" id="countryNameInput">
+                    <div class="form-grid"><div class="form-group"><label>Code ISO</label><input type="text" name="code" id="countryCodeInput" readonly class="form-readonly"></div><div class="form-group"><label>Devise</label><input type="text" name="currency" id="countryCurrencyInput" readonly class="form-readonly"></div></div>
                 </div>
-                <div class="detail-row"><span class="detail-label">Email</span><span class="detail-value" id="detailEmail"></span></div>
-                <div class="detail-row"><span class="detail-label">Téléphone</span><span class="detail-value" id="detailPhone"></span></div>
-                <div class="detail-row"><span class="detail-label">Rôle</span><span class="detail-value" id="detailRole"></span></div>
-                <div class="detail-row"><span class="detail-label">Statut</span><span class="detail-value" id="detailStatus"></span></div>
-                <div class="detail-row"><span class="detail-label">Inscrit le</span><span class="detail-value" id="detailDate"></span></div>
-            </div>
-            <div class="modal-foot"><button type="button" class="btn btn-primary" onclick="closeModal('viewUserModal')">Fermer</button></div>
+                <div class="modal-foot"><button type="submit" class="btn btn-primary">Ajouter</button></div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="modal" id="configModal">
+        <div class="modal-box">
+            <form id="configForm" method="POST" action="">
+                {% csrf_token %}
+                <div class="modal-head"><h3>Configuration</h3><i class="fas fa-times cursor-pointer" onclick="closeModal('configModal')"></i></div>
+                <div class="modal-body">
+                    <h4 id="configCountryName" style="margin-bottom:15px; color:var(--primary);"></h4>
+                    <div class="form-grid"><div class="form-group"><label>Abonnement</label><input type="number" name="subscription_price" id="confSubPrice"></div><div class="form-group"><label>Seuil Budget</label><input type="number" name="min_budget_threshold" id="confThreshold"></div></div>
+                    <div class="form-group"><label>Prix Contacts</label><input type="text" name="contact_prices" id="confContacts"></div>
+                    <div class="form-group"><label>Délai Casier</label><input type="number" name="casier_delay_weeks" id="confDelay"></div>
+                </div>
+                <div class="modal-foot"><button type="submit" class="btn btn-primary">Sauvegarder</button></div>
+            </form>
         </div>
     </div>
 
@@ -407,87 +472,100 @@
         <div class="modal-box">
             <form action="{% url 'create_sub_admin' %}" method="POST">
                 {% csrf_token %}
-                <div class="modal-head"><h3>Ajouter Sous-Admin</h3><i class="fas fa-times cursor-pointer" onclick="closeModal('addAdminModal')"></i></div>
+                <div class="modal-head"><h3>Ajouter Admin</h3><i class="fas fa-times cursor-pointer" onclick="closeModal('addAdminModal')"></i></div>
                 <div class="modal-body">
-                    <div class="form-grid">
-                        <div class="form-group"><label>Prénom</label><input type="text" name="first_name" required></div>
-                        <div class="form-group"><label>Nom</label><input type="text" name="last_name" required></div>
-                    </div>
+                    <div class="form-grid"><div class="form-group"><label>Prénom</label><input type="text" name="first_name"></div><div class="form-group"><label>Nom</label><input type="text" name="last_name"></div></div>
                     <div class="form-group"><label>Email</label><input type="email" name="email" required></div>
                     <div class="form-group"><label>Mot de passe</label><input type="password" name="password" required></div>
-                    <div style="background:#f9f9f9; padding:10px; margin-top:10px;">
-                        <input type="checkbox" name="perm_validation" checked> Validation Enseignants<br>
-                        <input type="checkbox" name="perm_users"> Gestion Utilisateurs
-                    </div>
+                    <div style="background:#f9f9f9; padding:10px;"><input type="checkbox" name="perm_validation" checked> Validation <input type="checkbox" name="perm_users"> Users</div>
                 </div>
-                <div class="modal-foot">
-                    <button type="button" class="btn btn-outline" onclick="closeModal('addAdminModal')">Annuler</button>
-                    <button type="submit" class="btn btn-primary">Créer</button>
-                </div>
+                <div class="modal-foot"><button type="submit" class="btn btn-primary">Créer</button></div>
             </form>
         </div>
     </div>
     {% endif %}
 
-    <script>
-        // --- NAVIGATION ONGLETS ---
-        const menuLinks = document.querySelectorAll('.menu a[data-target]');
-        const sections = document.querySelectorAll('.section');
-        const title = document.querySelector('.page-title');
+    <div class="modal" id="viewUserModal">
+        <div class="modal-box">
+            <div class="modal-head"><h3>Détails Utilisateur</h3><i class="fas fa-times cursor-pointer" onclick="closeModal('viewUserModal')"></i></div>
+            <div class="modal-body">
+                <div style="text-align:center; margin-bottom:20px;"><div style="width:70px; height:70px; background:var(--secondary); color:white; font-size:2rem; font-weight:bold; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto;" id="detailAvatar"></div><h2 id="detailName" style="margin-top:10px;"></h2></div>
+                <div class="info-grid"><span class="info-label">Email</span><span class="info-value" id="detailEmail"></span></div>
+                <div class="info-grid"><span class="info-label">Téléphone</span><span class="info-value" id="detailPhone"></span></div>
+                <div class="info-grid"><span class="info-label">Rôle</span><span class="info-value" id="detailRole"></span></div>
+                <div class="info-grid"><span class="info-label">Statut</span><span class="info-value" id="detailStatus"></span></div>
+                <div class="info-grid"><span class="info-label">Date</span><span class="info-value" id="detailDate"></span></div>
+            </div>
+            <div class="modal-foot"><button type="button" class="btn btn-primary" onclick="closeModal('viewUserModal')">Fermer</button></div>
+        </div>
+    </div>
 
-        menuLinks.forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                menuLinks.forEach(l => l.classList.remove('active'));
-                this.classList.add('active');
-                
-                const targetId = this.getAttribute('data-target');
-                sections.forEach(s => s.classList.remove('active'));
-                const targetSection = document.getElementById(targetId);
-                if(targetSection) targetSection.classList.add('active');
-                
-                title.textContent = this.textContent.trim();
+    <script>
+        // ONGLETS
+        document.querySelectorAll('.menu-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                const target = link.getAttribute('data-target');
+                if(target) {
+                    e.preventDefault();
+                    switchTab(target);
+                    document.querySelectorAll('.menu-link').forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+                    document.querySelector('.page-title').textContent = link.textContent.trim();
+                }
             });
         });
 
-        // --- MODALES ---
-        function openModal(id) { document.getElementById(id).classList.add('active'); }
-        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-        window.onclick = function(e) { if(e.target.classList.contains('modal')) e.target.classList.remove('active'); }
-
-        // --- AUTO-REMPLISSAGE PAYS (BASE DE DONNÉES INTERNE) ---
-        const worldCountries = [
-            {name: "Côte d'Ivoire", code: "CI", currency: "XOF"}, {name: "Sénégal", code: "SN", currency: "XOF"},
-            {name: "Cameroun", code: "CM", currency: "XAF"}, {name: "Mali", code: "ML", currency: "XOF"},
-            {name: "Burkina Faso", code: "BF", currency: "XOF"}, {name: "Togo", code: "TG", currency: "XOF"},
-            {name: "Bénin", code: "BJ", currency: "XOF"}, {name: "France", code: "FR", currency: "EUR"},
-            {name: "Gabon", code: "GA", currency: "XAF"}, {name: "Congo (RDC)", code: "CD", currency: "CDF"},
-            {name: "Maroc", code: "MA", currency: "MAD"}, {name: "Tunisie", code: "TN", currency: "TND"},
-            {name: "Canada", code: "CA", currency: "CAD"}, {name: "États-Unis", code: "US", currency: "USD"},
-            {name: "Guinée", code: "GN", currency: "GNF"}
-        ];
-
-        const countrySelect = document.getElementById('countrySelect');
-        if (countrySelect) {
-            worldCountries.forEach(c => {
-                const option = document.createElement('option');
-                option.value = c.code;
-                option.textContent = c.name;
-                countrySelect.appendChild(option);
-            });
+        function switchTab(targetId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(targetId).classList.add('active');
         }
 
+        // MODALES
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+        window.onclick = e => { if(e.target.classList.contains('modal')) e.target.classList.remove('active'); };
+
+        // AUTO-REMPLISSAGE PAYS
+        const worldCountries = [{name: "Côte d'Ivoire", code: "CI", currency: "XOF"}, {name: "Sénégal", code: "SN", currency: "XOF"}, {name: "Cameroun", code: "CM", currency: "XAF"}, {name: "Mali", code: "ML", currency: "XOF"}, {name: "Burkina Faso", code: "BF", currency: "XOF"}, {name: "Togo", code: "TG", currency: "XOF"}, {name: "Bénin", code: "BJ", currency: "XOF"}, {name: "France", code: "FR", currency: "EUR"}, {name: "Gabon", code: "GA", currency: "XAF"}, {name: "Congo (RDC)", code: "CD", currency: "CDF"}, {name: "Maroc", code: "MA", currency: "MAD"}, {name: "Tunisie", code: "TN", currency: "TND"}, {name: "Canada", code: "CA", currency: "CAD"}, {name: "États-Unis", code: "US", currency: "USD"}, {name: "Guinée", code: "GN", currency: "GNF"}];
+        const countrySelect = document.getElementById('countrySelect');
+        if (countrySelect) worldCountries.forEach(c => { const o = document.createElement('option'); o.value = c.code; o.textContent = c.name; countrySelect.appendChild(o); });
+        
         window.fillCountryInfo = function() {
-            const code = countrySelect.value;
-            const country = worldCountries.find(c => c.code === code);
-            if (country) {
-                document.getElementById('countryNameInput').value = country.name;
-                document.getElementById('countryCodeInput').value = country.code;
-                document.getElementById('countryCurrencyInput').value = country.currency;
-            }
+            const c = worldCountries.find(x => x.code === countrySelect.value);
+            if (c) { document.getElementById('countryNameInput').value = c.name; document.getElementById('countryCodeInput').value = c.code; document.getElementById('countryCurrencyInput').value = c.currency; }
         };
 
-        // --- DÉTAILS UTILISATEUR ---
+        // HELPERS
+        window.openConfigModal = function(id, name, sub, contacts, thresh, delay) {
+            document.getElementById('configForm').action = "/panel-admin/country/config/" + id + "/";
+            document.getElementById('configCountryName').textContent = name;
+            document.getElementById('confSubPrice').value = sub;
+            document.getElementById('confContacts').value = contacts;
+            document.getElementById('confThreshold').value = thresh;
+            document.getElementById('confDelay').value = delay;
+            openModal('configModal');
+        }
+
+        // VALIDATION STYLISEE
+        window.openValidationModal = function(id, name, email, cni, casier) {
+            document.getElementById('validationForm').action = "/panel-admin/tutor/validate/" + id + "/";
+            document.getElementById('valName').textContent = name;
+            document.getElementById('valEmail').textContent = email;
+            document.getElementById('linkCNI').href = cni !== 'None' ? cni : '#';
+            document.getElementById('linkCasier').href = casier !== 'None' ? casier : '#';
+            openModal('validationModal');
+        }
+        
+        // EDIT ARTICLE (NOUVEAU)
+        window.openEditArticleModal = function(id, title, catId, excerpt, content) {
+            document.getElementById('editArticleForm').action = "/panel-admin/article/edit/" + id + "/";
+            document.getElementById('editArtTitle').value = title;
+            document.getElementById('editArtCat').value = catId;
+            document.getElementById('editArtExcerpt').value = excerpt;
+            document.getElementById('editArtContent').value = content;
+            openModal('editArticleModal');
+        }
+
         window.showUserDetail = function(name, email, phone, role, status, date) {
             document.getElementById('detailName').textContent = name;
             document.getElementById('detailAvatar').textContent = name.charAt(0).toUpperCase();
@@ -497,34 +575,6 @@
             document.getElementById('detailStatus').textContent = status;
             document.getElementById('detailDate').textContent = date;
             openModal('viewUserModal');
-        }
-
-        // --- CONFIG PAYS ---
-        window.openConfigModal = function(id, name, sub, contacts, threshold, delay) {
-            document.getElementById('configForm').action = "/panel-admin/country/config/" + id + "/";
-            document.getElementById('configCountryName').textContent = name;
-            document.getElementById('confSubPrice').value = sub;
-            document.getElementById('confContacts').value = contacts;
-            document.getElementById('confThreshold').value = threshold;
-            document.getElementById('confDelay').value = delay;
-            openModal('configModal');
-        }
-
-        // --- VALIDATION PROF ---
-        window.openValidationModal = function(id, name, cniUrl, casierUrl) {
-            document.getElementById('validationForm').action = "/panel-admin/tutor/validate/" + id + "/";
-            document.getElementById('valTutorName').textContent = name;
-            
-            const linkCni = document.getElementById('linkCNI');
-            const linkCasier = document.getElementById('linkCasier');
-            
-            if(cniUrl && cniUrl !== 'None') { linkCni.href = cniUrl; linkCni.style.display = 'inline-block'; } 
-            else { linkCni.style.display = 'none'; }
-            
-            if(casierUrl && casierUrl !== 'None') { linkCasier.href = casierUrl; linkCasier.style.display = 'inline-block'; }
-            else { linkCasier.style.display = 'none'; }
-            
-            openModal('validationModal');
         }
     </script>
 </body>

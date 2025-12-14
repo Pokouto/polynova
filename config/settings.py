@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'apps.marketplace',
     'apps.billing',
     'apps.communication',
+    'apps.actualites',
 ]
 
 # 4. Middleware - AJOUTER WhiteNoise

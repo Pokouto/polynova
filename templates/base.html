@@ -171,6 +171,8 @@
                         </ul>
                     </li>
                     
+                    <li><a href="{% url 'actualites:list' %}">Blog</a></li>
+                    
                     <li><a href="{% url 'pricing' %}">Tarifs</a></li>
                     <li><a href="{% url 'about' %}">À propos</a></li>
                     <li><a href="{% url 'faq' %}">FAQ</a></li>
@@ -282,6 +284,8 @@
                     <li><a href="{% url 'register' %}">Devenir Enseignant</a></li>
                 {% endif %}
                 
+                <li><a href="{% url 'actualites:list' %}">Blog / Actualités</a></li>
+                
                 <li><a href="{% url 'pricing' %}">Tarifs</a></li>
                 <li><a href="{% url 'contact' %}">Contact</a></li>
             </ul>
@@ -321,6 +325,9 @@
                     <h3>Liens rapides</h3>
                     <ul class="footer-links">
                         <li><a href="{% url 'home' %}"><i class="fas fa-home"></i> Accueil</a></li>
+                        
+                        <li><a href="{% url 'actualites:list' %}"><i class="fas fa-newspaper"></i> Blog</a></li>
+                        
                         <li><a href="{% url 'about' %}"><i class="fas fa-info-circle"></i> À propos</a></li>
                         <li><a href="{% url 'pricing' %}"><i class="fas fa-tags"></i> Tarifs</a></li>
                         <li><a href="{% url 'faq' %}"><i class="fas fa-question-circle"></i> FAQ</a></li>
