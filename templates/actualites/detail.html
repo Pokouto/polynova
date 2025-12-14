@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}{{ article.title }} - PolyNova{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-12">
+    
+    <a href="{% url 'actualites:list' %}" class="text-blue-600 hover:underline mb-6 inline-block">
+        <i class="fas fa-arrow-left mr-2"></i> Retour aux articles
+    </a>
+
+    <article class="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100 mb-10">
+        {% if article.image %}
+        <div class="h-80 w-full relative">
+            <img src="{{ article.image.url }}" alt="{{ article.title }}" class="w-full h-full object-cover">
+            {% if article.category %}
+            <span class="absolute bottom-4 left-4 bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-bold shadow">
+                {{ article.category.name }}
+            </span>
+            {% endif %}
+        </div>
+        {% endif %}
+        
+        <div class="p-8">
+            <h1 class="text-3xl font-extrabold text-gray-900 mb-4">{{ article.title }}</h1>
+            <div class="flex items-center text-gray-500 text-sm mb-8 border-b pb-6">
+                <span class="mr-4"><i class="fas fa-user mr-2"></i> {{ article.author.first_name }} {{ article.author.last_name }}</span>
+                <span><i class="far fa-calendar-alt mr-2"></i> {{ article.created_at|date:"d F Y" }}</span>
+            </div>
+            
+            <div class="prose max-w-none text-gray-800 leading-relaxed text-lg">
+                {{ article.content|linebreaks }}
+            </div>
+
+            <div class="mt-10 pt-6 border-t flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    {% if user.is_authenticated %}
+                        <form action="{% url 'actualites:like_article' article.slug %}" method="POST">
+                            {% csrf_token %}
+                            <button type="submit" class="flex items-center gap-2 px-4 py-2 rounded-full transition {% if is_liked %}bg-red-100 text-red-600{% else %}bg-gray-100 text-gray-600 hover:bg-gray-200{% endif %}">
+                                <i class="{% if is_liked %}fas{% else %}far{% endif %} fa-heart text-xl"></i>
+                                <span class="font-bold">{{ total_likes }}</span>
+                            </button>
+                        </form>
+                    {% else %}
+                        <a href="{% url 'login' %}?next={{ request.path }}" class="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200">
+                            <i class="far fa-heart text-xl"></i>
+                            <span class="font-bold">{{ total_likes }}</span>
+                        </a>
+                    {% endif %}
+                    <span class="text-gray-500 text-sm">personnes aiment cet article</span>
+                </div>
+                
+                <div class="flex gap-3 text-gray-400">
+                    <i class="fab fa-facebook hover:text-blue-600 cursor-pointer text-xl"></i>
+                    <i class="fab fa-twitter hover:text-blue-400 cursor-pointer text-xl"></i>
+                    <i class="fab fa-whatsapp hover:text-green-500 cursor-pointer text-xl"></i>
+                </div>
+            </div>
+        </div>
+    </article>
+
+    <div class="bg-white rounded-2xl shadow-sm p-8 border border-gray-100">
+        <h3 class="text-2xl font-bold mb-6"><i class="far fa-comments mr-2 text-blue-600"></i> Commentaires ({{ comments.count }})</h3>
+        
+        {% if user.is_authenticated %}
+            <form method="POST" class="mb-10">
+                {% csrf_token %}
+                <div class="mb-4">
+                    {{ form.content }}
+                </div>
+                <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition">
+                    Publier mon commentaire
+                </button>
+            </form>
+        {% else %}
+            <div class="bg-blue-50 p-4 rounded-lg text-blue-800 mb-8 flex items-center gap-3">
+                <i class="fas fa-info-circle text-xl"></i>
+                <div>
+                    Vous devez être <a href="{% url 'login' %}?next={{ request.path }}" class="font-bold underline">connecté</a> pour laisser un commentaire.
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="space-y-6">
+            {% for comment in comments %}
+            <div class="flex gap-4">
+                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center font-bold text-gray-600">
+                    {{ comment.author.first_name|slice:":1" }}
+                </div>
+                <div>
+                    <div class="bg-gray-50 p-4 rounded-lg rounded-tl-none">
+                        <div class="flex items-center justify-between mb-2">
+                            <h4 class="font-bold text-gray-900">{{ comment.author.first_name }} {{ comment.author.last_name }}</h4>
+                            <span class="text-xs text-gray-500">{{ comment.created_at|timesince }}</span>
+                        </div>
+                        <p class="text-gray-700">{{ comment.content }}</p>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-gray-500 italic text-center py-4">Soyez le premier à commenter cet article !</p>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

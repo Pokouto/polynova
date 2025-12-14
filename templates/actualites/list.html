@@ -1,34 +1,122 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block title %}Blog & Conseils - PolyNova{% endblock %}
+
 {% block content %}
-<div class="bg-blue-600 py-12 text-center text-white">
-    <h1 class="text-4xl font-bold mb-4">Le Blog PolyNova</h1>
-    <p class="text-xl opacity-90">Conseils et actualités éducatives.</p>
+<div class="bg-blue-600 py-16 text-center text-white">
+    <div class="max-w-4xl mx-auto px-4">
+        <h1 class="text-4xl md:text-5xl font-extrabold mb-6">Le Blog PolyNova</h1>
+        <p class="text-xl opacity-90 max-w-2xl mx-auto leading-relaxed">
+            Retrouvez nos conseils pour la réussite scolaire, des astuces pour les parents et toute l'actualité de l'éducation en Côte d'Ivoire.
+        </p>
+    </div>
 </div>
 
-<div class="max-w-7xl mx-auto px-4 py-12">
-    <div class="flex justify-center gap-3 mb-10">
-        <a href="{% url 'actualites:list' %}" class="px-4 py-2 rounded-full font-bold {% if not current_cat %}bg-blue-600 text-white{% else %}bg-gray-100{% endif %}">Tous</a>
-        {% for c in categories %}
-        <a href="{% url 'actualites:category' c.slug %}" class="px-4 py-2 rounded-full font-bold {% if current_cat == c %}bg-blue-600 text-white{% else %}bg-gray-100{% endif %}">{{ c.name }}</a>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 bg-gray-50 min-h-screen">
+    
+    <div class="flex flex-wrap justify-center gap-3 mb-12">
+        <a href="{% url 'actualites:list' %}" 
+           class="px-6 py-2 rounded-full text-sm font-bold transition-all duration-300 transform hover:-translate-y-1 
+           {% if not current_cat %}bg-blue-600 text-white shadow-lg ring-2 ring-blue-300{% else %}bg-white text-gray-600 hover:bg-gray-100 border border-gray-200 shadow-sm{% endif %}">
+            Tous les articles
+        </a>
+        
+        {% for cat in categories %}
+        <a href="{% url 'actualites:category' cat.slug %}" 
+           class="px-6 py-2 rounded-full text-sm font-bold transition-all duration-300 transform hover:-translate-y-1 
+           {% if current_cat == cat %}bg-blue-600 text-white shadow-lg ring-2 ring-blue-300{% else %}bg-white text-gray-600 hover:bg-gray-100 border border-gray-200 shadow-sm{% endif %}">
+            {{ cat.name }}
+        </a>
         {% endfor %}
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {% for article in page_obj %}
-        <div class="bg-white rounded-lg shadow overflow-hidden border">
-            <div class="h-48 bg-gray-200 relative">
-                {% if article.image %}<img src="{{ article.image.url }}" class="w-full h-full object-cover">{% endif %}
-                <span class="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">{{ article.category.name }}</span>
-            </div>
-            <div class="p-5">
-                <h2 class="text-xl font-bold mb-2">{{ article.title }}</h2>
-                <p class="text-gray-600 text-sm mb-4">{{ article.excerpt }}</p>
-                <a href="#" class="text-blue-600 font-bold text-sm">Lire la suite →</a>
-            </div>
+    {% if page_obj %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for article in page_obj %}
+            <article class="bg-white rounded-2xl shadow-sm hover:shadow-xl transition duration-300 overflow-hidden border border-gray-100 flex flex-col h-full group">
+                
+                <a href="{% url 'actualites:detail' article.slug %}" class="block h-52 overflow-hidden bg-gray-200 relative">
+                    {% if article.image %}
+                        <img src="{{ article.image.url }}" alt="{{ article.title }}" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-700">
+                    {% else %}
+                        <div class="w-full h-full flex items-center justify-center text-gray-400 bg-gray-100">
+                            <i class="fas fa-newspaper text-5xl opacity-50"></i>
+                        </div>
+                    {% endif %}
+                    
+                    {% if article.category %}
+                    <div class="absolute top-4 left-4">
+                        <span class="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md backdrop-blur-sm bg-opacity-90">
+                            {{ article.category.name }}
+                        </span>
+                    </div>
+                    {% endif %}
+                </a>
+
+                <div class="p-6 flex flex-col flex-grow">
+                    <div class="flex items-center text-xs text-gray-500 mb-3 font-semibold uppercase tracking-wide">
+                        <span class="flex items-center"><i class="far fa-calendar-alt mr-2"></i>{{ article.created_at|date:"d M Y" }}</span>
+                        <span class="mx-2">•</span>
+                        <span class="flex items-center"><i class="fas fa-user mr-2"></i>{{ article.author.first_name }}</span>
+                    </div>
+                    
+                    <h2 class="text-xl font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-blue-600 transition">
+                        <a href="{% url 'actualites:detail' article.slug %}">
+                            {{ article.title }}
+                        </a>
+                    </h2>
+                    
+                    <p class="text-gray-600 mb-6 line-clamp-3 flex-grow text-sm leading-relaxed">
+                        {{ article.excerpt }}
+                    </p>
+
+                    <div class="flex items-center justify-between border-t border-gray-100 pt-4 mt-auto">
+                        <a href="{% url 'actualites:detail' article.slug %}" class="inline-flex items-center font-bold text-blue-600 hover:text-blue-800 transition text-sm">
+                            Lire la suite <i class="fas fa-arrow-right ml-2 text-xs transform group-hover:translate-x-1 transition"></i>
+                        </a>
+                        
+                        <div class="flex gap-3 text-gray-400 text-xs">
+                            <span class="flex items-center"><i class="far fa-heart mr-1"></i> {{ article.total_likes }}</span>
+                            <span class="flex items-center"><i class="far fa-comment mr-1"></i> {{ article.comments.count }}</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
         </div>
-        {% empty %}
-        <div class="col-span-3 text-center py-10 text-gray-500">Aucun article publié pour l'instant.</div>
-        {% endfor %}
-    </div>
+
+        {% if page_obj.has_other_pages %}
+        <div class="mt-16 flex justify-center">
+            <nav class="flex items-center space-x-2 bg-white p-2 rounded-xl shadow-sm border border-gray-100">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" class="w-10 h-10 flex items-center justify-center rounded-lg text-gray-500 hover:bg-blue-50 hover:text-blue-600 transition">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+                {% endif %}
+                
+                <span class="px-6 py-2 text-sm font-bold text-blue-600 bg-blue-50 rounded-lg">
+                    Page {{ page_obj.number }}
+                </span>
+
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="w-10 h-10 flex items-center justify-center rounded-lg text-gray-500 hover:bg-blue-50 hover:text-blue-600 transition">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+                {% endif %}
+            </nav>
+        </div>
+        {% endif %}
+
+    {% else %}
+        <div class="text-center py-24 bg-white rounded-3xl shadow-sm border border-gray-100 max-w-2xl mx-auto">
+            <div class="mb-6 bg-blue-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto text-blue-500">
+                <i class="fas fa-pencil-alt text-4xl"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-800 mb-2">C'est un peu vide ici...</h3>
+            <p class="text-gray-500">Aucun article n'a encore été publié dans cette catégorie.</p>
+            <a href="{% url 'actualites:list' %}" class="inline-block mt-6 text-blue-600 font-bold hover:underline">Voir tous les articles</a>
+        </div>
+    {% endif %}
 </div>
 {% endblock %}
