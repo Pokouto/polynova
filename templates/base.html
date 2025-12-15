@@ -1,9 +1,11 @@
+{% load static %}
+{% load i18n %}
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="{% get_current_language as LANGUAGE_CODE %}{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}PolyNova - Soutien Scolaire{% endblock %}</title>
+    <title>{% block title %}PolyNova - {% trans "Soutien Scolaire" %}{% endblock %}</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -11,15 +13,10 @@
 
     <style>
         :root {
-            --primary: #3498db;
-            --primary-dark: #2980b9;
-            --secondary: #2ecc71;
-            --secondary-dark: #27ae60;
-            --accent: #e74c3c;
-            --light: #f8f9fa;
-            --dark: #2c3e50;
-            --gray: #7f8c8d;
-            --light-gray: #ecf0f1;
+            --primary: #3498db; --primary-dark: #2980b9;
+            --secondary: #2ecc71; --secondary-dark: #27ae60;
+            --accent: #e74c3c; --light: #f8f9fa; --dark: #2c3e50;
+            --gray: #7f8c8d; --light-gray: #ecf0f1;
             --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             --transition: all 0.3s ease;
         }
@@ -29,26 +26,20 @@
         ul { list-style: none; padding: 0; margin: 0; }
         .container { width: 95%; max-width: 1280px; margin: 0 auto; padding: 0 20px; }
 
-        /* --- HEADER UNIQUE --- */
+        /* --- HEADER --- */
         header { background-color: white; box-shadow: var(--shadow); position: sticky; top: 0; z-index: 1000; height: 75px; display: flex; align-items: center; }
         .header-main { display: flex; justify-content: space-between; align-items: center; width: 100%; }
         
-        /* Logo */
         .logo { font-size: 1.6rem; font-weight: 700; color: var(--primary); display: flex; align-items: center; flex-shrink: 0; margin-right: 20px; text-transform: uppercase; letter-spacing: -0.5px; }
         .logo span { color: var(--secondary); }
         .logo i { margin-right: 8px; font-size: 1.4rem; }
 
-        /* Navigation (Police Réduite ici) */
+        /* Navigation Desktop */
         .desktop-nav { display: flex; align-items: center; margin-left: 20px; }
         .desktop-menu { display: flex; gap: 5px; }
         .desktop-menu > li > a { 
-            font-weight: 600; 
-            font-size: 0.85rem; /* RÉDUIT pour que tout tienne */
-            color: var(--dark); 
-            padding: 8px 10px; /* Padding ajusté */
-            border-radius: 6px; 
-            display: block; 
-            white-space: nowrap;
+            font-weight: 600; font-size: 0.85rem; color: var(--dark); 
+            padding: 8px 10px; border-radius: 6px; display: block; white-space: nowrap; 
         }
         .desktop-menu > li > a:hover { color: var(--primary); background-color: var(--light); }
 
@@ -64,28 +55,27 @@
         .dropdown-content a, .dropdown-content button { display: flex; align-items: center; width: 100%; text-align: left; padding: 8px 20px; font-size: 0.9rem; color: var(--dark); background: none; border: none; cursor: pointer; }
         .dropdown-content a:hover, .dropdown-content button:hover { background-color: var(--light); color: var(--primary); }
 
-        /* Zone Droite */
+        /* Right Section & Selectors */
         .right-section { margin-left: auto; display: flex; align-items: center; gap: 15px; }
         .nav-selectors { display: flex; align-items: center; gap: 10px; border-right: 1px solid #eee; padding-right: 20px; margin-right: 5px; }
         .selector-item { display: flex; align-items: center; color: var(--dark); font-size: 0.8rem; font-weight: 700; cursor: pointer; background-color: #f0f2f5; padding: 4px 8px; border-radius: 6px; }
         .selector-item i { margin-right: 5px; color: var(--primary); }
         .selector-item select { border: none; background: transparent; color: inherit; font-weight: inherit; cursor: pointer; outline: none; appearance: none; padding-right: 2px; }
 
-        /* Boutons Auth */
+        /* Auth Buttons */
         .btn-auth { padding: 7px 16px; border-radius: 50px; font-weight: 600; font-size: 0.85rem; transition: var(--transition); border: 1px solid transparent; margin-left: 5px; }
         .btn-login { color: var(--primary); border-color: var(--primary); background: transparent; }
         .btn-login:hover { background: var(--light); }
         .btn-signup { background-color: var(--primary); color: white; box-shadow: 0 2px 5px rgba(52, 152, 219, 0.3); }
         .btn-signup:hover { background-color: var(--primary-dark); transform: translateY(-1px); }
+        
         .user-btn { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 5px 10px; border-radius: 30px; transition: var(--transition); border: 1px solid transparent; position: relative; }
         .user-btn:hover { background-color: var(--light); border-color: #eee; }
         .user-avatar { width: 30px; height: 30px; background-color: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.8rem; }
         .user-name { font-weight: 600; font-size: 0.85rem; display: flex; flex-direction: column; line-height: 1.1; }
         .user-role { font-size: 0.65rem; color: var(--gray); font-weight: normal; }
 
-        /* Badge Notification */
-        .notif-badge { background-color: var(--accent); color: white; font-size: 0.65rem; font-weight: bold; padding: 2px 5px; border-radius: 10px; margin-left: auto; }
-        .user-btn.has-notif::after { content: ''; position: absolute; top: 0; right: 0; width: 8px; height: 8px; background-color: var(--accent); border-radius: 50%; border: 2px solid white; }
+        /* Notifications */
         .nav-icon-btn { position: relative; color: var(--gray); font-size: 1.1rem; transition: 0.2s; margin-right: 5px; }
         .nav-icon-btn:hover { color: var(--primary); }
         .badge-counter { position: absolute; top: -5px; right: -5px; background-color: var(--accent); color: white; font-size: 0.6rem; font-weight: bold; height: 14px; min-width: 14px; display: flex; align-items: center; justify-content: center; border-radius: 10px; border: 2px solid white; }
@@ -98,7 +88,6 @@
         .footer-links li { margin-bottom: 8px; display: flex; align-items: center; }
         .footer-links a { transition: var(--transition); display: flex; align-items: center; color: #bdc3c7; font-size: 0.85rem; }
         .footer-links a:hover { color: var(--primary); padding-left: 5px; }
-        .footer-links i { margin-right: 10px; width: 15px; text-align: center; color: var(--primary); opacity: 0.8; }
         .social-links { display: flex; gap: 10px; margin-top: 15px; }
         .social-links a { display: flex; align-items: center; justify-content: center; width: 35px; height: 35px; background-color: rgba(255, 255, 255, 0.1); border-radius: 50%; transition: var(--transition); color: white; font-size: 1rem; }
         .social-links a:hover { background-color: var(--primary); transform: translateY(-3px); color: white; }
@@ -110,7 +99,6 @@
         .burger div { height: 2px; width: 100%; background-color: var(--dark); border-radius: 10px; transition: var(--transition); }
         .mobile-menu { position: fixed; top: 75px; left: 0; width: 100%; background-color: white; padding: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); transform: translateY(-120%); transition: var(--transition); z-index: 998; border-top: 1px solid #eee; }
         .mobile-menu.active { transform: translateY(0); }
-        .mobile-menu ul { display: flex; flex-direction: column; gap: 5px; }
         .mobile-menu a, .mobile-menu button { display: block; padding: 12px; border-bottom: 1px solid #f5f5f5; font-size: 0.95rem; width: 100%; text-align: left; background: none; }
         @media (max-width: 1024px) { .desktop-nav, .right-section { display: none; } .mobile-nav { display: block; margin-left: auto; } }
 
@@ -120,10 +108,31 @@
         .alert-success { background-color: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
         .alert-error { background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
         .alert-info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+
+        /* OVERLAY BLOCAGE PAYS */
+        .country-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.95); z-index: 9999; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); animation: fadeIn 0.3s; }
+        .hidden { display: none !important; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+
+    <div id="countryBlockModal" class="country-overlay hidden">
+        <div class="text-center text-white px-4 max-w-2xl">
+            <i class="fas fa-map-marker-alt text-6xl text-red-500 mb-6 animate-bounce"></i>
+            <h2 class="text-3xl md:text-5xl font-extrabold mb-6 leading-tight">
+                {% trans "Oups !" %}
+            </h2>
+            <p class="text-xl md:text-2xl font-light mb-8 opacity-90">
+                {% trans "La plateforme n'est pas encore disponible au" %} :<br>
+                <span id="blockedCountryName" class="font-bold text-red-400 mt-3 block text-4xl"></span>
+            </p>
+            <button onclick="resetToCI()" class="bg-white text-gray-900 px-8 py-3 rounded-full font-bold text-lg hover:bg-gray-100 transition transform hover:scale-105 shadow-xl">
+                {% trans "Retourner en Côte d'Ivoire" %}
+            </button>
+        </div>
+    </div>
 
     <header>
         <div class="container header-main">
@@ -134,21 +143,27 @@
             
             <nav class="desktop-nav">
                 <ul class="desktop-menu">
-                    <li><a href="{% url 'home' %}">Accueil</a></li>
+                    <li><a href="{% url 'home' %}">{% trans "Accueil" %}</a></li>
                     
                     <li class="dropdown">
                         <a href="#">
-                            {% if user.role == 'parent' %}Parents{% elif user.role == 'tutor' %}Enseignants{% else %}Utilisateurs{% endif %}
+                            {% if user.role == 'parent' %}
+                                {% trans "Parents" %}
+                            {% elif user.role == 'tutor' %}
+                                {% trans "Enseignants" %}
+                            {% else %}
+                                {% trans "Utilisateurs" %}
+                            {% endif %}
                             <i class="fas fa-caret-down"></i>
                         </a>
                         <ul class="dropdown-content">
                             
                             {% if not user.is_authenticated or user.role == 'parent' or user.is_superuser %}
-                                <li class="dropdown-header">Parents</li>
-                                <li><a href="{% url 'create_request' %}"><i class="fas fa-edit mr-2"></i> Déposer une demande</a></li>
-                                <li><a href="{% url 'tutor_list' %}"><i class="fas fa-search mr-2"></i> Trouver un prof</a></li>
+                                <li class="dropdown-header">{% trans "Parents" %}</li>
+                                <li><a href="{% url 'create_request' %}"><i class="fas fa-edit mr-2"></i> {% trans "Déposer une demande" %}</a></li>
+                                <li><a href="{% url 'tutor_list' %}"><i class="fas fa-search mr-2"></i> {% trans "Trouver un prof" %}</a></li>
                                 {% if user.role == 'parent' %}
-                                    <li><a href="{% url 'dashboard' %}" class="active-link"><i class="fas fa-user-circle mr-2"></i> Mon espace</a></li>
+                                    <li><a href="{% url 'dashboard' %}" class="active-link"><i class="fas fa-user-circle mr-2"></i> {% trans "Mon espace" %}</a></li>
                                 {% endif %}
                             {% endif %}
 
@@ -157,26 +172,26 @@
                             {% endif %}
 
                             {% if not user.is_authenticated or user.role == 'tutor' or user.is_superuser %}
-                                <li class="dropdown-header">Enseignants</li>
+                                <li class="dropdown-header">{% trans "Enseignants" %}</li>
                                 {% if not user.is_authenticated %}
-                                    <li><a href="{% url 'register' %}"><i class="fas fa-user-plus mr-2"></i> Devenir enseignant</a></li>
+                                    <li><a href="{% url 'register' %}"><i class="fas fa-user-plus mr-2"></i> {% trans "Devenir enseignant" %}</a></li>
                                 {% endif %}
                                 {% if user.role == 'tutor' or user.is_superuser %}
-                                    <li><a href="{% url 'request_list' %}"><i class="fas fa-list-ul mr-2"></i> Demandes de cours</a></li>
+                                    <li><a href="{% url 'request_list' %}"><i class="fas fa-list-ul mr-2"></i> {% trans "Demandes de cours" %}</a></li>
                                 {% endif %}
                                 {% if user.role == 'tutor' %}
-                                    <li><a href="{% url 'dashboard' %}" class="active-link"><i class="fas fa-chalkboard-teacher mr-2"></i> Mon espace</a></li>
+                                    <li><a href="{% url 'dashboard' %}" class="active-link"><i class="fas fa-chalkboard-teacher mr-2"></i> {% trans "Mon espace" %}</a></li>
                                 {% endif %}
                             {% endif %}
                         </ul>
                     </li>
                     
-                    <li><a href="{% url 'actualites:list' %}">Blog</a></li>
+                    <li><a href="{% url 'actualites:list' %}">{% trans "Blog" %}</a></li>
                     
-                    <li><a href="{% url 'pricing' %}">Tarifs</a></li>
-                    <li><a href="{% url 'about' %}">À propos</a></li>
-                    <li><a href="{% url 'faq' %}">FAQ</a></li>
-                    <li><a href="{% url 'contact' %}">Contact</a></li>
+                    <li><a href="{% url 'pricing' %}">{% trans "Tarifs" %}</a></li>
+                    <li><a href="{% url 'about' %}">{% trans "À propos" %}</a></li>
+                    <li><a href="{% url 'faq' %}">{% trans "FAQ" %}</a></li>
+                    <li><a href="{% url 'contact' %}">{% trans "Contact" %}</a></li>
                 </ul>
             </nav>
 
@@ -185,15 +200,29 @@
                 <div class="nav-selectors">
                     <div class="selector-item">
                         <i class="fas fa-globe-africa"></i>
-                        <select title="Pays"><option value="ci">CI</option><option value="sn">SN</option><option value="cm">CM</option></select>
-                    </div>
-                    <div class="selector-item">
-                        <select title="Langue">
-                            {% load i18n %}
-                            {% get_current_language as LANGUAGE_CODE %}
-                            <option value="fr" {% if LANGUAGE_CODE == 'fr' %}selected{% endif %}>FR</option>
-                            <option value="en" {% if LANGUAGE_CODE == 'en' %}selected{% endif %}>EN</option>
+                        <select title="Pays" id="headerCountrySelect">
+                            {% for country in header_countries %}
+                                <option value="{{ country.code|lower }}" data-name="{{ country.name }}">{{ country.code|upper }}</option>
+                            {% empty %}
+                                <option value="ci" data-name="Côte d'Ivoire">CI</option>
+                            {% endfor %}
                         </select>
+                    </div>
+
+                    <div class="selector-item">
+                        <form action="{% url 'set_language' %}" method="post" id="langForm">
+                            {% csrf_token %}
+                            <input name="next" type="hidden" value="{{ request.get_full_path }}">
+                            <select name="language" onchange="document.getElementById('langForm').submit();" title="Langue">
+                                {% get_available_languages as LANGUAGES %}
+                                {% get_language_info_list for LANGUAGES as languages %}
+                                {% for language in languages %}
+                                    <option value="{{ language.code }}" {% if language.code == LANGUAGE_CODE %}selected{% endif %}>
+                                        {{ language.code|upper }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </form>
                     </div>
                 </div>
 
@@ -211,26 +240,26 @@
                             <div class="user-avatar">{{ user.username|slice:":1"|upper }}</div>
                             <div class="user-name">
                                 {{ user.first_name|default:user.username }}
-                                <span class="user-role">{% if user.role == 'tutor' %}Prof{% elif user.role == 'parent' %}Parent{% else %}Admin{% endif %}</span>
+                                <span class="user-role">{% if user.role == 'tutor' %}{% trans "Prof" %}{% elif user.role == 'parent' %}{% trans "Parent" %}{% else %}Admin{% endif %}</span>
                             </div>
                             <i class="fas fa-caret-down" style="color:var(--gray); font-size:0.8rem;"></i>
                         </div>
                         <ul class="dropdown-content">
-                            <li><a href="{% url 'dashboard' %}"><i class="fas fa-tachometer-alt mr-2 text-blue-500"></i> Mon Tableau de bord</a></li>
+                            <li><a href="{% url 'dashboard' %}"><i class="fas fa-tachometer-alt mr-2 text-blue-500"></i> {% trans "Mon Tableau de bord" %}</a></li>
                             <li class="dropdown-divider"></li>
                             <li>
                                 <form action="{% url 'logout' %}" method="post" style="width: 100%;">
                                     {% csrf_token %}
                                     <button type="submit" style="color: var(--accent);">
-                                        <i class="fas fa-sign-out-alt mr-2"></i> Déconnexion
+                                        <i class="fas fa-sign-out-alt mr-2"></i> {% trans "Déconnexion" %}
                                     </button>
                                 </form>
                             </li>
                         </ul>
                     </div>
                 {% else %}
-                    <a href="{% url 'login' %}" class="btn-auth btn-login">Connexion</a>
-                    <a href="{% url 'register' %}" class="btn-auth btn-signup">Inscription</a>
+                    <a href="{% url 'login' %}" class="btn-auth btn-login">{% trans "Connexion" %}</a>
+                    <a href="{% url 'register' %}" class="btn-auth btn-signup">{% trans "Inscription" %}</a>
                 {% endif %}
             </div>
             
@@ -241,21 +270,21 @@
             <ul>
                 {% if user.is_authenticated %}
                     <li style="padding: 10px; background: #f8f9fa; border-radius: 6px; margin-bottom: 10px;">
-                        <span style="font-weight:bold; color:var(--primary);">Bonjour, {{ user.username }}</span>
+                        <span style="font-weight:bold; color:var(--primary);">{% trans "Bonjour" %}, {{ user.username }}</span>
                     </li>
                     
                     {% if user.role == 'parent' %}
-                        <li><a href="{% url 'dashboard' %}"><i class="fas fa-user-circle mr-2"></i> Mon Espace</a></li>
-                        <li><a href="{% url 'create_request' %}">Déposer une demande</a></li>
-                        <li><a href="{% url 'tutor_list' %}">Trouver un professeur</a></li>
+                        <li><a href="{% url 'dashboard' %}"><i class="fas fa-user-circle mr-2"></i> {% trans "Mon Espace" %}</a></li>
+                        <li><a href="{% url 'create_request' %}">{% trans "Déposer une demande" %}</a></li>
+                        <li><a href="{% url 'tutor_list' %}">{% trans "Trouver un professeur" %}</a></li>
                     {% elif user.role == 'tutor' %}
-                        <li><a href="{% url 'dashboard' %}"><i class="fas fa-chalkboard-teacher mr-2"></i> Mon Espace</a></li>
-                        <li><a href="{% url 'request_list' %}">Demandes de cours</a></li>
+                        <li><a href="{% url 'dashboard' %}"><i class="fas fa-chalkboard-teacher mr-2"></i> {% trans "Mon Espace" %}</a></li>
+                        <li><a href="{% url 'request_list' %}">{% trans "Demandes de cours" %}</a></li>
                     {% endif %}
 
                     <li>
                         <a href="{% url 'inbox' %}" style="display:flex; justify-content:space-between;">
-                            <span><i class="fas fa-envelope mr-2"></i> Messagerie</span>
+                            <span><i class="fas fa-envelope mr-2"></i> {% trans "Messagerie" %}</span>
                             {% if unread_messages_count > 0 %}
                                 <span class="notif-badge">{{ unread_messages_count }}</span>
                             {% endif %}
@@ -267,27 +296,26 @@
                         <form action="{% url 'logout' %}" method="post">
                             {% csrf_token %}
                             <button type="submit" style="color:var(--accent); font-weight:bold;">
-                                <i class="fas fa-sign-out-alt mr-2"></i> Déconnexion
+                                <i class="fas fa-sign-out-alt mr-2"></i> {% trans "Déconnexion" %}
                             </button>
                         </form>
                     </li>
 
                 {% else %}
                     <div style="display:flex; gap:10px; margin-bottom:15px;">
-                        <a href="{% url 'login' %}" class="btn-auth btn-login" style="flex:1; text-align:center;">Connexion</a>
-                        <a href="{% url 'register' %}" class="btn-auth btn-signup" style="flex:1; text-align:center;">Inscription</a>
+                        <a href="{% url 'login' %}" class="btn-auth btn-login" style="flex:1; text-align:center;">{% trans "Connexion" %}</a>
+                        <a href="{% url 'register' %}" class="btn-auth btn-signup" style="flex:1; text-align:center;">{% trans "Inscription" %}</a>
                     </div>
-                    <li class="dropdown-header">Navigation</li>
-                    <li><a href="{% url 'home' %}">Accueil</a></li>
-                    <li><a href="{% url 'tutor_list' %}">Trouver un professeur</a></li>
-                    <li><a href="{% url 'create_request' %}">Déposer une demande</a></li>
-                    <li><a href="{% url 'register' %}">Devenir Enseignant</a></li>
+                    <li class="dropdown-header">{% trans "Navigation" %}</li>
+                    <li><a href="{% url 'home' %}">{% trans "Accueil" %}</a></li>
+                    <li><a href="{% url 'tutor_list' %}">{% trans "Trouver un professeur" %}</a></li>
+                    <li><a href="{% url 'create_request' %}">{% trans "Déposer une demande" %}</a></li>
+                    <li><a href="{% url 'register' %}">{% trans "Devenir Enseignant" %}</a></li>
                 {% endif %}
                 
-                <li><a href="{% url 'actualites:list' %}">Blog / Actualités</a></li>
-                
-                <li><a href="{% url 'pricing' %}">Tarifs</a></li>
-                <li><a href="{% url 'contact' %}">Contact</a></li>
+                <li><a href="{% url 'actualites:list' %}">{% trans "Blog / Actualités" %}</a></li>
+                <li><a href="{% url 'pricing' %}">{% trans "Tarifs" %}</a></li>
+                <li><a href="{% url 'contact' %}">{% trans "Contact" %}</a></li>
             </ul>
         </div>
     </header>
@@ -312,7 +340,7 @@
                 
                 <div class="footer-section">
                     <h3>PolyNova</h3>
-                    <p style="color:#bdc3c7; line-height:1.4; margin-bottom:15px;">La référence du soutien scolaire en Côte d'Ivoire.</p>
+                    <p style="color:#bdc3c7; line-height:1.4; margin-bottom:15px;">{% trans "La référence du soutien scolaire en Côte d'Ivoire." %}</p>
                     <div class="social-links">
                         <a href="#"><i class="fab fa-facebook-f"></i></a>
                         <a href="#"><i class="fab fa-twitter"></i></a>
@@ -322,30 +350,28 @@
                 </div>
 
                 <div class="footer-section">
-                    <h3>Liens rapides</h3>
+                    <h3>{% trans "Liens rapides" %}</h3>
                     <ul class="footer-links">
-                        <li><a href="{% url 'home' %}"><i class="fas fa-home"></i> Accueil</a></li>
-                        
-                        <li><a href="{% url 'actualites:list' %}"><i class="fas fa-newspaper"></i> Blog</a></li>
-                        
-                        <li><a href="{% url 'about' %}"><i class="fas fa-info-circle"></i> À propos</a></li>
-                        <li><a href="{% url 'pricing' %}"><i class="fas fa-tags"></i> Tarifs</a></li>
-                        <li><a href="{% url 'faq' %}"><i class="fas fa-question-circle"></i> FAQ</a></li>
+                        <li><a href="{% url 'home' %}"><i class="fas fa-home"></i> {% trans "Accueil" %}</a></li>
+                        <li><a href="{% url 'actualites:list' %}"><i class="fas fa-newspaper"></i> {% trans "Blog" %}</a></li>
+                        <li><a href="{% url 'about' %}"><i class="fas fa-info-circle"></i> {% trans "À propos" %}</a></li>
+                        <li><a href="{% url 'pricing' %}"><i class="fas fa-tags"></i> {% trans "Tarifs" %}</a></li>
+                        <li><a href="{% url 'faq' %}"><i class="fas fa-question-circle"></i> {% trans "FAQ" %}</a></li>
                     </ul>
                 </div>
 
                 <div class="footer-section">
-                    <h3>Aide</h3>
+                    <h3>{% trans "Aide" %}</h3>
                     <ul class="footer-links">
-                        <li><a href="{% url 'contact' %}"><i class="fas fa-envelope"></i> Contact</a></li>
-                        <li><a href="#"><i class="fas fa-gavel"></i> Mentions légales</a></li>
-                        <li><a href="#"><i class="fas fa-file-contract"></i> CGU / CGV</a></li>
-                        <li><a href="#"><i class="fas fa-shield-alt"></i> Confidentialité</a></li>
+                        <li><a href="{% url 'contact' %}"><i class="fas fa-envelope"></i> {% trans "Contact" %}</a></li>
+                        <li><a href="#"><i class="fas fa-gavel"></i> {% trans "Mentions légales" %}</a></li>
+                        <li><a href="#"><i class="fas fa-file-contract"></i> {% trans "CGU / CGV" %}</a></li>
+                        <li><a href="#"><i class="fas fa-shield-alt"></i> {% trans "Confidentialité" %}</a></li>
                     </ul>
                 </div>
 
                 <div class="footer-section">
-                    <h3>Contact</h3>
+                    <h3>{% trans "Contact" %}</h3>
                     <ul class="footer-links">
                         <li><i class="fas fa-map-marker-alt mr-2"></i> Abidjan, Côte d'Ivoire</li>
                         <li><i class="fas fa-envelope mr-2"></i> contact@polynova.ci</li>
@@ -355,7 +381,7 @@
             </div>
             
             <div class="footer-bottom">
-                <p>&copy; 2025 PolyNova Group. Tous droits réservés.</p>
+                <p>&copy; 2025 PolyNova Group. {% trans "Tous droits réservés." %}</p>
             </div>
         </div>
     </footer>
@@ -365,6 +391,56 @@
             const menu = document.getElementById('mobileMenu');
             menu.classList.toggle('active');
         }
+
+        // --- GESTION BLOCAGE PAYS ---
+        document.addEventListener('DOMContentLoaded', function() {
+            const countrySelect = document.getElementById('headerCountrySelect');
+            const modal = document.getElementById('countryBlockModal');
+            const blockedName = document.getElementById('blockedCountryName');
+
+            // 1. Vérifier si un pays est déjà stocké
+            const savedCountry = localStorage.getItem('polynova_country');
+            
+            if (savedCountry && savedCountry !== 'ci') {
+                // Trouver le nom du pays stocké
+                const option = countrySelect.querySelector(`option[value="${savedCountry}"]`);
+                if (option) {
+                    countrySelect.value = savedCountry;
+                    blockedName.textContent = option.getAttribute('data-name');
+                    modal.classList.remove('hidden');
+                    document.body.style.overflow = 'hidden';
+                }
+            } else {
+                countrySelect.value = 'ci'; // Par défaut
+            }
+
+            // 2. Détecter le changement
+            countrySelect.addEventListener('change', function() {
+                const selectedCode = this.value;
+                const selectedName = this.options[this.selectedIndex].getAttribute('data-name');
+
+                if (selectedCode !== 'ci') {
+                    // Bloquer
+                    blockedName.textContent = selectedName;
+                    modal.classList.remove('hidden');
+                    document.body.style.overflow = 'hidden';
+                    localStorage.setItem('polynova_country', selectedCode);
+                } else {
+                    // Débloquer
+                    modal.classList.add('hidden');
+                    document.body.style.overflow = 'auto';
+                    localStorage.setItem('polynova_country', 'ci');
+                }
+            });
+
+            // 3. Fonction bouton retour
+            window.resetToCI = function() {
+                countrySelect.value = 'ci';
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+                localStorage.setItem('polynova_country', 'ci');
+            };
+        });
     </script>
     {% block extra_js %}{% endblock %}
 </body>
